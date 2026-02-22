@@ -1,0 +1,33 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.PhotoUploadViewModel
+
+@{
+    ViewData["Title"] = "Upload Photo";
+}
+
+<h2>Upload Photo</h2>
+
+<form asp-action="Upload" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label class="form-label">Title</label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Description</label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Image</label>
+        <input asp-for="ImageFile" type="file" class="form-control" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Upload</button>
+</form>
