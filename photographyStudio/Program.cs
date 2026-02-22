@@ -1,4 +1,7 @@
-namespace photographyStudio
+using Microsoft.EntityFrameworkCore;
+using KxnPhotoStudio.Data;
+
+namespace KxnPhotoStudio
 {
     public class Program
     {
@@ -8,6 +11,10 @@ namespace photographyStudio
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            // Dependency injection Kexhawn
+            builder.Services.AddDbContext<AppDbContext>(options =>
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
             var app = builder.Build();
 

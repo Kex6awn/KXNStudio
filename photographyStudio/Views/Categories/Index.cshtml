@@ -1,0 +1,21 @@
+﻿@model List<KxnPhotoStudio.Models.Category>
+
+@{
+    ViewData["Title"] = "Categories";
+}
+
+<h1>Categories</h1>
+
+@if (!Model.Any())
+{
+    <p>No categories found.</p>
+}
+else
+{
+    <ul>
+        @foreach (var c in Model)
+        {
+            <li>@c.Name</li>
+        }
+    </ul>
+}

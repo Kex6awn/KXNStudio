@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace photographyStudio.Controllers
+namespace KxnPhotoStudio.Controllers
 {
     public class HomeController : Controller
     {

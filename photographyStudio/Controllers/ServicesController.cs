@@ -2,7 +2,7 @@
 
 namespace photographyStudio.Controllers
 {
-    public class ServicesController : Controller
+    public class ServicesController1 : Controller
     {
         public IActionResult Index()
         {

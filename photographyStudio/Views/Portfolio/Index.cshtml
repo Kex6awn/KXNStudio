@@ -1,0 +1,31 @@
+﻿@model List<KxnPhotoStudio.Models.Photo>
+
+@{
+    ViewData["Title"] = "Portfolio";
+}
+
+<h1 class="text-center mt-4">Our Works</h1>
+
+<div class="container mt-4">
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <p>No photos uploaded yet.</p>
+        }
+        else
+        {
+            @foreach (var photo in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <img src="@photo.ImagePath" class="card-img-top" alt="@photo.Title"/>
+                        <div class="card-body">
+                            <h5>@photo.Title</h5>
+                            <p class="text-muted">@photo.Category?.Name</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</div>

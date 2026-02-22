@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.11.35303.130
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "photographyStudio", "photographyStudio\photographyStudio.csproj", "{E2A42FC8-6AED-449B-B9E7-8C96D19BAB60}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KxnPhotoStudio", "photographyStudio\KxnPhotoStudio.csproj", "{E2A42FC8-6AED-449B-B9E7-8C96D19BAB60}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
