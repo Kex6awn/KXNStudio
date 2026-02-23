@@ -60,7 +60,7 @@ namespace KxnPhotoStudio.Controllers
                 Title = model.Title,
                 Description = model.Description,
                 CategoryId = model.CategoryId,
-                ImagePath = "/uploads" + uniqueFileName
+                ImagePath = "/uploads/" + uniqueFileName
             };
 
             _context.Photos.Add(photo);
