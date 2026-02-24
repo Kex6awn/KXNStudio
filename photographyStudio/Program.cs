@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using KxnPhotoStudio.Data;
+using Microsoft.AspNetCore.Identity;
 
 namespace KxnPhotoStudio
 {
@@ -16,6 +17,15 @@ namespace KxnPhotoStudio
             builder.Services.AddDbContext<AppDbContext>(options =>
             options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+            // Identity Services (login/cookies/password hashing)
+            builder.Services
+                .AddIdentity<IdentityUser, IdentityRole>(options =>
+                {
+                    options.SignIn.RequireConfirmedAccount = false;
+                })
+                .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders();
+
             var app = builder.Build();
 
             // Configure the HTTP request pipeline.
@@ -31,11 +41,16 @@ namespace KxnPhotoStudio
 
             app.UseRouting();
 
+            // Authorization Enabled
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            // Identity/Account/Login Enabled
+            app.MapRazorPages();
 
             app.Run();
         }
