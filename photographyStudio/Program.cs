@@ -12,6 +12,7 @@ namespace KxnPhotoStudio
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+            builder.Services.AddRazorPages();
 
             // Dependency injection Kexhawn
             builder.Services.AddDbContext<AppDbContext>(options =>
@@ -48,6 +49,11 @@ namespace KxnPhotoStudio
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            app.MapControllerRoute(
+                name: "areas",
+                pattern: "{area:exists}/{controller=Dashboard}/{action=Index}/{id?}"
+            );
 
             // Identity/Account/Login Enabled
             app.MapRazorPages();
