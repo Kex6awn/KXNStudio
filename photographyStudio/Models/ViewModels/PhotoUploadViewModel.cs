@@ -12,7 +12,6 @@ namespace KxnPhotoStudio.Models.ViewModels
         [Required]
         public int CategoryId { get; set; }
 
-        [Required]
         public IFormFile ImageFile { get; set; } = null!;
     }
 }

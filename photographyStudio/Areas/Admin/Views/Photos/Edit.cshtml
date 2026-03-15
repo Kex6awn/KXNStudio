@@ -1,0 +1,43 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.PhotoUploadViewModel
+
+@{
+    ViewData["Title"] = "Edit Photo";
+}
+
+<h1>Edit Photo</h1>
+
+@if (ViewBag.CurrentImagePath != null)
+{
+    <div class="mb-3">
+        <p>Current Image:</p>
+        <img src="@ViewBag.CurrentImagePath" alt="Current photo" style="max-width: 250px; height: auto;" class="img-thumbnail" />
+    </div>
+}
+
+<form asp-action="Edit" asp-route-id="@ViewBag.PhotoId" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="Title" class="form-label"></label>
+        <input asp-for="Title" class="form-control" />
+        <span asp-validation-for="Title" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="ImageFile" class="form-label">Replace Image (optional)</label>
+        <input asp-for="ImageFile" type="file" class="form-control" />
+        <span asp-validation-for="ImageFile" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>

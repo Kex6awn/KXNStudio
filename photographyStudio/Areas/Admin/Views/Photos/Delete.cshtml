@@ -1,0 +1,29 @@
+﻿@model KxnPhotoStudio.Models.Photo
+
+@{
+    ViewData["Title"] = "Delete Photo";
+}
+
+<h1>Delete Photo</h1>
+
+<div class="alert alert-warning">
+    Are you sure you want to delete this photo?
+</div>
+
+<div class="mb-3">
+    <img src="@Model.ImagePath" alt="@Model.Title" style="max-width: 250px; height: auto;" class="img-thumbnail" />
+</div>
+
+<div class="mb-3">
+    <strong>Title:</strong> @Model.Title
+</div>
+
+<div class="mb-3">
+    <strong>Category:</strong> @Model.Category?.Name
+</div>
+
+<form asp-action="Delete" method="post">
+    <input type="hidden" asp-for="PhotoId" />
+    <button type="submit" class="btn btn-danger">Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
