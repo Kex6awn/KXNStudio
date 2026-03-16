@@ -1,11 +1,13 @@
 ﻿using KxnPhotoStudio.Data;
 using KxnPhotoStudio.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
 {
     [Area("Admin")]
+    [Authorize]
     public class CategoriesController : Controller
     {
         private readonly AppDbContext _context;

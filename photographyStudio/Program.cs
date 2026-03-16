@@ -1,12 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using KxnPhotoStudio.Data;
 using Microsoft.AspNetCore.Identity;
+using System.Threading.Tasks;
 
 namespace KxnPhotoStudio
 {
     public class Program
     {
-        public static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
 
@@ -26,6 +27,12 @@ namespace KxnPhotoStudio
                 })
                 .AddEntityFrameworkStores<AppDbContext>()
                 .AddDefaultTokenProviders();
+
+            builder.Services.ConfigureApplicationCookie(options =>
+            {
+                options.LoginPath = "/Admin/Auth/Login";
+                options.LogoutPath = "/Admin/Auth/Logout";
+            });
 
             var app = builder.Build();
 
@@ -56,7 +63,36 @@ namespace KxnPhotoStudio
                 pattern: "{controller=Home}/{action=Index}/{id?}"
                 );
 
+            using (var scope = app.Services.CreateScope())
+            {
+                var services = scope.ServiceProvider;
+                var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
+                string adminEmail = "admin@kxn.com";
+                string adminPassword = "Admin123!";
+
+                var existingUser = await userManager.FindByEmailAsync(adminEmail);
+
+                if (existingUser == null)
+                {
+                    var adminUser = new IdentityUser
+                    {
+                        UserName = adminEmail,
+                        Email = adminEmail,
+                        EmailConfirmed = true
+                    };
+
+                    var result = await userManager.CreateAsync(adminUser, adminPassword);
+
+                    if (!result.Succeeded)
+                    {
+                        foreach (var error in result.Errors)
+                        {
+                            Console.WriteLine(error.Description);
+                        }
+                    }
+                }
+            }
 
             // Identity/Account/Login Enabled
             app.MapRazorPages();
