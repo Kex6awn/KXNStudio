@@ -8,6 +8,25 @@ html {
   }
 }
 
+.portfolio-img {
+    height: 300px;
+    object-fit: cover;
+}
+
+.card:hover .portfolio-img {
+    transform: scale(1.02);
+    transition: transform 0.3s ease;
+}
+
+#dropZone {
+    transition: all 0.2s ease;
+}
+
+#dropZone.border-dark {
+    background-color: #f8f9fa;
+    border-width: 2px !important;
+}
+
 .btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }

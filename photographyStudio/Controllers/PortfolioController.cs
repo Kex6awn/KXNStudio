@@ -17,12 +17,33 @@ namespace KxnPhotoStudio.Controllers
             _context = context;
         }
 
-        public async Task<IActionResult> Index ()
+        public async Task<IActionResult> Index(int? categoryId)
         {
-            var photos = await _context.Photos.Include(p => p.Category).OrderByDescending(p => p.CreatedDate).ToListAsync();
+            ViewBag.Categories = await _context.Categories
+                .OrderBy(c => c.Name)
+                .ToListAsync();
+
+            ViewBag.SelectedCategoryId = categoryId;
+
+            var query = _context.Photos.Include(p => p.Category).AsQueryable();
+            
+            if (categoryId.HasValue)
+            {
+                query = query.Where(p => p.CategoryId == categoryId.Value);
+            }
+
+            var photos = await query
+                .OrderByDescending(p => p.CreatedDate)
+                .ToListAsync();
 
             return View(photos);
         }
+        //public async Task<IActionResult> Index ()
+        //{
+        //    var photos = await _context.Photos.Include(p => p.Category).OrderByDescending(p => p.CreatedDate).ToListAsync();
+
+        //    return View(photos);
+        //}
 
         // GET: Upload
         public async Task<IActionResult> Upload()

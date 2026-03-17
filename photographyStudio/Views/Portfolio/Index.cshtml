@@ -2,26 +2,54 @@
 
 @{
     ViewData["Title"] = "Portfolio";
+    var categories = ViewBag.Categories as List<KxnPhotoStudio.Models.Category>;
+    int? selectedCategoryId = ViewBag.SelectedCategoryId as int?;
 }
 
-<h1 class="text-center mt-4">Our Works</h1>
+<h1 class="text-center mt-4">Our Work</h1>
 
 <div class="container mt-4">
+
+    <div class="mb-4 text-center">
+        <a asp-controller="Portfolio" asp-action="Index"
+           class="btn @(selectedCategoryId == null ? "btn-dark" : "btn-outline-dark") me-2 mb-2">
+            All
+        </a>
+
+        @if (categories != null)
+        {
+            @foreach (var category in categories)
+            {
+                <a asp-controller="Portfolio"
+                   asp-action="Index"
+                   asp-route-categoryId="@category.CategoryId"
+                   class="btn @(selectedCategoryId == category.CategoryId ? "btn-dark" : "btn-outline-dark") me-2 mb-2">
+                    @category.Name
+                </a>
+            }
+        }
+    </div>
+
     <div class="row">
         @if (!Model.Any())
         {
-            <p>No photos uploaded yet.</p>
+            <p class="text-center">No photos uploaded yet.</p>
         }
         else
         {
             @foreach (var photo in Model)
             {
                 <div class="col-md-4 mb-4">
-                    <div class="card shadow-sm">
-                        <img src="@photo.ImagePath" class="card-img-top" alt="@photo.Title"/>
+                    <div class="card shadow-sm h-100">
+                        <img src="@photo.ImagePath"
+                             class="card-img-top portfolio-img"
+                             alt="@photo.Title"
+                             loading="lazy"
+                             data-title="@photo.Title"
+                             data-description="@photo.Description" />
                         <div class="card-body">
                             <h5>@photo.Title</h5>
-                            <p class="text-muted">@photo.Category?.Name</p>
+                            <p class="text-muted mb-0">@photo.Category?.Name</p>
                         </div>
                     </div>
                 </div>
@@ -29,3 +57,35 @@
         }
     </div>
 </div>
+
+<div class="modal fade" id="lightboxModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-0">
+                <h5 class="modal-title" id="lightboxTitle"></h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center">
+                <img id="lightboxImage" src="" alt="" class="img-fluid rounded" />
+                <p id="lightboxDescription" class="mt-3 mb-0"></p>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll(".portfolio-img").forEach(img => {
+            img.style.cursor = "pointer";
+
+            img.addEventListener("click", function () {
+                document.getElementById("lightboxImage").src = this.src;
+                document.getElementById("lightboxTitle").textContent = this.dataset.title || "";
+                document.getElementById("lightboxDescription").textContent = this.dataset.description || "";
+
+                const modal = new bootstrap.Modal(document.getElementById("lightboxModal"));
+                modal.show();
+            });
+        });
+    </script>
+}

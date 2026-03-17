@@ -4,7 +4,7 @@
     ViewData["Title"] = "Upload Photo";
 }
 
-<h1 class="mb-3">Upload Photo</h1>
+<h1>Upload Photo</h1>
 
 <form asp-action="Create" method="post" enctype="multipart/form-data">
     <div class="mb-3">
@@ -25,11 +25,63 @@
     </div>
 
     <div class="mb-3">
-        <label asp-for="ImageFile" class="form-label">Image</label>
-        <input asp-for="ImageFile" type="file" class="form-control"/>
-        <span asp-validation-for="ImageFile" class="text-danger"></span>
+        <label class="form-label">Image</label>
+
+        <div id="dropZone" class="border rounded p-4 text-center bg-light" style="cursor:pointer;">
+            <p class="mb-2">Drag and drop an image here</p>
+            <p class="mb-2">or click to select a file</p>
+            <input asp-for="ImageFile" type="file" class="form-control d-none" id="imageInput" accept="image/*" />
+            <span asp-validation-for="ImageFile" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <p class="mb-2">Preview:</p>
+        <img id="previewImage" src="#" alt="Preview" class="img-thumbnail d-none" style="max-width: 250px;" />
     </div>
 
     <button type="submit" class="btn btn-dark">Upload</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>
+
+@section Scripts {
+        <script>
+            const dropZone = document.getElementById("dropZone");
+            const imageInput = document.getElementById("imageInput");
+            const preview = document.getElementById("previewImage");
+
+            dropZone.addEventListener("click", () => imageInput.click());
+
+            dropZone.addEventListener("dragover", (e) => {
+                e.preventDefault();
+                dropZone.classList.add("border-dark");
+            });
+
+            dropZone.addEventListener("dragleave", () => {
+                dropZone.classList.remove("border-dark");
+            });
+
+            dropZone.addEventListener("drop", (e) => {
+                e.preventDefault();
+                dropZone.classList.remove("border-dark");
+
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    const dt = new DataTransfer();
+                    dt.items.add(file);
+                    imageInput.files = dt.files;
+
+                    preview.src = URL.createObjectURL(file);
+                    preview.classList.remove("d-none");
+                }
+            });
+
+            imageInput.addEventListener("change", function () {
+                const file = this.files[0];
+                if (file) {
+                    preview.src = URL.createObjectURL(file);
+                    preview.classList.remove("d-none");
+                }
+            });
+        </script>
+}
