@@ -1,0 +1,92 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.MultiPhotoUploadViewModel
+
+@{
+    ViewData["Title"] = "Multi Upload";
+}
+
+<h1>Multi Upload Photos</h1>
+
+<form asp-action="MultiUpload" method="post" enctype="multipart/form-data">
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">Category</label>
+        <select asp-for="CategoryId" class="form-select" asp-items="ViewBag.Categories"></select>
+        <span asp-validation-for="CategoryId" class="text-danger"></span>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label"></label>
+        <textarea asp-for="Description" class="form-control"></textarea>
+    </div>
+
+    <div class="mb-3">
+        <label class="form-label">Images</label>
+
+        <div id="dropZone" class="border rounded p-4 text-center bg-light" style="cursor:pointer;">
+            <p class="mb-2">Drag and drop images here</p>
+            <p class="mb-2">or click to select multiple files</p>
+            <input asp-for="ImageFiles" type="file" class="form-control d-none" id="imageInput" accept="image/*" multiple />
+            <span asp-validation-for="ImageFiles" class="text-danger"></span>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <p class="mb-2">Preview:</p>
+        <div id="previewContainer" class="row g-3"></div>
+    </div>
+
+    <button type="submit" class="btn btn-dark">Upload All</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
+
+@section Scripts {
+    <script>
+        const dropZone = document.getElementById("dropZone");
+        const imageInput = document.getElementById("imageInput");
+        const previewContainer = document.getElementById("previewContainer");
+
+        dropZone.addEventListener("click", () => imageInput.click());
+
+        dropZone.addEventListener("dragover", (e) => {
+            e.preventDefault();
+            dropZone.classList.add("border-dark");
+        });
+
+        dropZone.addEventListener("dragleave", () => {
+            dropZone.classList.remove("border-dark");
+        });
+
+        dropZone.addEventListener("drop", (e) => {
+            e.preventDefault();
+            dropZone.classList.remove("border-dark");
+
+            const files = e.dataTransfer.files;
+            imageInput.files = files;
+            renderPreviews(files);
+        });
+
+        imageInput.addEventListener("change", function () {
+            renderPreviews(this.files);
+        });
+
+        function renderPreviews(files) {
+            previewContainer.innerHTML = "";
+
+            Array.from(files).forEach(file => {
+                if (!file.type.startsWith("image/")) return;
+
+                const col = document.createElement("div");
+                col.className = "col-md-3 col-sm-4 col-6";
+
+                const img = document.createElement("img");
+                img.src = URL.createObjectURL(file);
+                img.className = "img-fluid rounded shadow-sm";
+                img.style.height = "180px";
+                img.style.width = "100%";
+                img.style.objectFit = "cover";
+
+                col.appendChild(img);
+                previewContainer.appendChild(col);
+            });
+        }
+    </script>
+}

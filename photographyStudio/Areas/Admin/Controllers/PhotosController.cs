@@ -187,5 +187,60 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
             return RedirectToAction(nameof(Index));
         }
+
+        public IActionResult MultiUpload()
+        {
+            ViewBag.Categories = new SelectList(_context.Categories, "CategoryId", "Name");
+            return View();
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> MultiUpload(MultiPhotoUploadViewModel model)
+        {
+            if (model.ImageFiles == null || !model.ImageFiles.Any())
+            {
+                ModelState.AddModelError("ImageFiles", "Please select at least one image.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
+                return View(model);
+            }
+
+            var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
+            Directory.CreateDirectory(uploadsFolder);
+
+            foreach (var imageFile in model.ImageFiles)
+            {
+                if (imageFile.Length <= 0) continue;
+
+                var safeFileName = Path.GetFileName(imageFile.FileName);
+                var uniqueFileName = $"{Guid.NewGuid()}_{safeFileName}";
+                var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    await imageFile.CopyToAsync(stream);
+                }
+
+                var titleFromFileName = Path.GetFileNameWithoutExtension(safeFileName);
+
+                var photo = new Photo
+                {
+                    Title = titleFromFileName,
+                    Description = model.Description,
+                    CategoryId = model.CategoryId,
+                    ImagePath = "/uploads/" + uniqueFileName,
+                    CreatedDate = DateTime.UtcNow
+                };
+
+                _context.Photos.Add(photo);
+            }
+
+            await _context.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
     }
 }

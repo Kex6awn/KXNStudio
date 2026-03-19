@@ -8,14 +8,31 @@ html {
   }
 }
 
+.modal-content {
+    background-color: rgba(0, 0, 0, 0.95) !important;
+}
+
+#lightboxImage {
+    transition: transform 0.3s ease;
+}
+
+#lightboxImage:hover {
+    transform: scale(1.02);
+}
+
 .portfolio-img {
     height: 300px;
     object-fit: cover;
+    transition: transform 0.3s ease;
 }
 
 .card:hover .portfolio-img {
     transform: scale(1.02);
     transition: transform 0.3s ease;
+}
+
+#lightboxImage {
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
 }
 
 #dropZone {
