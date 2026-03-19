@@ -48,6 +48,14 @@ html {
   box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
 }
 
+#previewContainer img {
+    transition: transform 0.2s ease;
+}
+
+#previewContainer img:hover {
+    transform: scale(1.02);
+}
+
 html {
   position: relative;
   min-height: 100%;
