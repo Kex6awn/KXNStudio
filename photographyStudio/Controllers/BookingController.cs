@@ -6,7 +6,6 @@ namespace KxnPhotoStudio.Controllers
 {
     public class BookingController : Controller
     {
-
         private readonly AppDbContext _context;
 
         public BookingController(AppDbContext context)
@@ -24,7 +23,7 @@ namespace KxnPhotoStudio.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Booking booking)
         {
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid)
             {
                 return View(booking);
             }
@@ -37,6 +36,7 @@ namespace KxnPhotoStudio.Controllers
 
             return RedirectToAction(nameof(ThankYou));
         }
+
         public IActionResult ThankYou()
         {
             return View();

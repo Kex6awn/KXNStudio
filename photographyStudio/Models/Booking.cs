@@ -9,11 +9,11 @@ namespace KxnPhotoStudio.Models
 
         [Required]
         [StringLength(100)]
-        public string FullName { get; set; } = String.Empty;
+        public string FullName { get; set; } = string.Empty;
 
         [Required]
         [EmailAddress]
-        public string Email { get; set; } = String.Empty;
+        public string Email { get; set; } = string.Empty;
 
         [Phone]
         [StringLength(20)]
@@ -21,7 +21,7 @@ namespace KxnPhotoStudio.Models
 
         [Required]
         [StringLength(100)]
-        public string ServiceType { get; set; } = String.Empty;
+        public string ServiceType { get; set; } = string.Empty;
 
         [Required]
         public DateTime EventDate { get; set; }
