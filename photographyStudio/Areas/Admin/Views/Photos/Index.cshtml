@@ -17,6 +17,7 @@
             <th>Title</th>
             <th>Category</th>
             <th>Created</th>
+            <th>Featured</th>
             <th style="width: 180px;">Actions</th>
         </tr>
     </thead>
@@ -33,6 +34,16 @@
                 <td>
                     <a asp-action="Edit" asp-route-id="@photo.PhotoId" class="btn btn-sm btn-primary">Edit</a>
                     <a asp-action="Delete" asp-route-id="@photo.PhotoId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+                <td>
+                    @if (photo.IsFeatured)
+                    {
+                        <span class="badge bg-success">Yes</span>
+                    }
+                    else
+                    {
+                        <span class="badge bg-secondary">No</span>
+                    }
                 </td>
             </tr>
         }

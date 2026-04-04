@@ -40,6 +40,11 @@
         <img id="previewImage" src="#" alt="Preview" class="img-thumbnail d-none" style="max-width: 250px;" />
     </div>
 
+    <div class="form-check mb-3">
+        <input asp-for="IsFeatured" class="form-check-input" />
+        <label asp-for="IsFeatured" class="form-check-label">Featured Photo</label>
+    </div>
+
     <button type="submit" class="btn btn-dark">Upload</button>
     <a asp-action="Index" class="btn btn-secondary">Cancel</a>
 </form>

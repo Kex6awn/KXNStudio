@@ -70,7 +70,8 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                 Description = model.Description,
                 CategoryId = model.CategoryId,
                 ImagePath = "/uploads/" + uniqueFileName,
-                CreatedDate = DateTime.UtcNow
+                CreatedDate = DateTime.UtcNow,
+                IsFeatured = model.IsFeatured
             };
 
             _context.Photos.Add(photo);
@@ -92,7 +93,8 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             {
                 Title = photo.Title,
                 Description = photo.Description,
-                CategoryId = photo.CategoryId
+                CategoryId = photo.CategoryId,
+                IsFeatured = photo.IsFeatured
             };
 
             ViewBag.PhotoId = photo.PhotoId;
@@ -119,6 +121,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             photo.Title = model.Title;
             photo.Description = model.Description;
             photo.CategoryId = model.CategoryId;
+            photo.IsFeatured = model.IsFeatured;
 
             if (model.ImageFile != null)
             {
@@ -233,7 +236,8 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                     Description = model.Description,
                     CategoryId = model.CategoryId,
                     ImagePath = "/uploads/" + uniqueFileName,
-                    CreatedDate = DateTime.UtcNow
+                    CreatedDate = DateTime.UtcNow,
+                    //IsFeatured = model.IsFeatured
                 };
 
                 _context.Photos.Add(photo);

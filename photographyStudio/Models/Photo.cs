@@ -18,6 +18,8 @@ namespace KxnPhotoStudio.Models
 
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
+        public bool IsFeatured { get; set; } = false;
+
         // FK + Navigation
         [Required]
         public int CategoryId { get; set; }

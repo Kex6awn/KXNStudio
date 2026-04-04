@@ -1,6 +1,44 @@
-﻿@{
+﻿@model List<KxnPhotoStudio.Models.Photo>
+@{
     ViewData["Title"] = "Home";
 }
 
 <h1>KXN Photo Studio</h1>
 <p>Home page is working.</p>
+
+<div class="text-center py-5 bg-light rounded mb-5">
+    <h1 class="display-4 fw-bold">KXN Photo Studio</h1>
+    <p class="lead">Capturing potraits, weddings, and unforgettable events.</p>
+    <a asp-controller="Portfolio" asp-action="Index" class="btn btn-dark btn-lg mt-2">View Portfolio</a>
+</div>
+
+<section class="mb-5">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2 class="mb-0">Featured Work</h2>
+        <a asp-controller="Portfolio" asp-action="Index" class="btn btn-outline-dark">See All</a></a>
+    </div>
+
+    <div class="row">
+        @if (!Model.Any())
+        {
+            <p>No featured photos yet.</p>
+        }
+        else
+        {
+            @foreach (var photo in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm h-100">
+                        <img src="@photo.ImagePath" class="card-img-top portfolio-img" 
+                             alt="@photo.Title" 
+                             loading="lazy" />
+                        <div class="card-body">
+                            <h5>@photo.Title</h5>
+                            <p class="text-muted mb-0">@photo.Category?.Name</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+    </div>
+</section>
