@@ -1,0 +1,41 @@
+﻿@model List<KxnPhotoStudio.Models.Booking>
+
+@{
+    ViewData["Title"] = "Bookings";
+}
+
+<h1 class="mb-4">Booking Requests</h1>
+
+<table class="table table-bordered table-striped">
+    <thead class="table-dark">
+        <tr>
+            <th>Name</th>
+            <th>Email</th>
+            <th>Services</th>
+            <th>Date</th>
+            <th>Status</th>
+            <th style="width: 220px;">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var b in Model)
+        {
+            <tr>
+                <td>@b.FullName</td>
+                <td>@b.Email</td>
+                <td>@b.ServiceType</td>
+                <td>@b.EventDate.ToShortDateString()</td>
+                <td>
+                    <span class="badge @(b.Status == "Pending" ? "bg-warning" : b.Status == "Confirmed" ? "bg-success" : "bg-secondary")">
+                        @b.Status
+                    </span>
+                </td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@b.BookingId" class="btn btn-sm btn-info">View</a>
+                    <a asp-action="Edit" asp-route-id="@b.BookingId" class="btn btn-sm btn-primary">Edit</a>
+                    <a asp-action="Delete" asp-route-id="@b.BookingId" class="btn btn-sm btn-danger">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

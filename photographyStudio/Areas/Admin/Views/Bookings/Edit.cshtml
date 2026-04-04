@@ -1,0 +1,22 @@
+﻿@model KxnPhotoStudio.Models.Booking
+
+@{
+}
+
+<h2>Update Booking Status</h2>
+
+<form asp-action="Edit" method="post">
+    <input type="hidden" asp-for"BookingId" />
+
+    <div class="mb-3">
+        <label class="form-label">Status</label>
+        <select asp-for="Status" class="form-select">
+            <option>Pending</option>
+            <option>Confirmed</option>
+            <option>Cancelled</option>
+        </select>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Update</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
