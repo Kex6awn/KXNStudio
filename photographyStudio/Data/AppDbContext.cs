@@ -12,6 +12,8 @@ namespace KxnPhotoStudio.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Photo> Photos => Set<Photo>();
 
+        public DbSet<Booking> Bookings => Set<Booking>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
