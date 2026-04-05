@@ -1,20 +1,22 @@
-﻿@model KxnPhotoStudio.Models.Booking
+﻿@model KxnPhotoStudio.Models.ViewModels.BookingStatusViewModel
 
 @{
+    ViewData["Title"] = "Update Booking Status";
 }
 
 <h2>Update Booking Status</h2>
 
 <form asp-action="Edit" method="post">
-    <input type="hidden" asp-for"BookingId" />
+    <input type="hidden" asp-for="BookingId" />
 
     <div class="mb-3">
-        <label class="form-label">Status</label>
+        <label asp-for="Status" class="form-label"></label>
         <select asp-for="Status" class="form-select">
-            <option>Pending</option>
-            <option>Confirmed</option>
-            <option>Cancelled</option>
+            <option value="Pending">Pending</option>
+            <option value="Confirmed">Confirmed</option>
+            <option value="Cancelled">Cancelled</option>
         </select>
+        <span asp-validation-for="Status" class="text-danger"></span>
     </div>
 
     <button type="submit" class="btn btn-primary">Update</button>

@@ -3,6 +3,7 @@ using KxnPhotoStudio.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using KxnPhotoStudio.Models.ViewModels;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
 {
@@ -11,12 +12,13 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
     public class BookingsController : Controller
     {
         private readonly AppDbContext _context;
+
         public BookingsController(AppDbContext context)
         {
             _context = context;
         }
 
-        //List all bookings
+        // List all bookings
         public async Task<IActionResult> Index()
         {
             var bookings = await _context.Bookings
@@ -47,22 +49,28 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             var booking = await _context.Bookings.FindAsync(id);
             if (booking == null) return NotFound();
 
-            return View(booking);
+            var model = new BookingStatusViewModel
+            {
+                BookingId = booking.BookingId,
+                Status = booking.Status
+            };
+
+            return View(model);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, Booking booking)
+        public async Task<IActionResult> Edit(int id, BookingStatusViewModel model)
         {
-            if (id != booking.BookingId) return NotFound();
+            if (id != model.BookingId) return NotFound();
 
             if (!ModelState.IsValid)
-                return View(booking);
+                return View(model);
 
             var existing = await _context.Bookings.FindAsync(id);
             if (existing == null) return NotFound();
 
-            existing.Status = booking.Status;
+            existing.Status = model.Status;
 
             await _context.SaveChangesAsync();
 
