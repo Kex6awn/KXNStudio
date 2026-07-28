@@ -13,6 +13,8 @@
             <th>Email</th>
             <th>Service</th>
             <th>Date</th>
+            <th>Time</th>
+            <th>Hours</th>
             <th>Status</th>
             <th style="width: 220px;">Actions</th>
         </tr>
@@ -25,6 +27,8 @@
                 <td>@b.Email</td>
                 <td>@b.ServiceType</td>
                 <td>@b.EventDate.ToShortDateString()</td>
+                <td>@b.StartTime.ToString(@"hh\:mm")</td>
+                <td>@b.DurationHours</td>
                 <td>
                     <span class="badge @(b.Status == "Pending" ? "bg-warning" : b.Status == "Confirmed" ? "bg-success" : "bg-secondary")">
                         @b.Status

@@ -45,9 +45,27 @@
                 </div>
 
                 <div class="mb-3">
+                    <label asp-for="DurationHours" class="form-label"></label>
+                    <input asp-for="DurationHours" type="number" min="1" max="12" value="1" class="form-control" id="durationInput" />
+                    <span asp-validation-for="DurationHours" class="text-danger"></span>
+                </div>
+                <div id="availabilityNotice" class="text-muted mb-3"></div>
+
+                <div class="mb-3">
+                    <p class="text-muted mb-0">
+                        Select the session length first to view available dates and times.
+                    </p>
                     <label asp-for="EventDate" class="form-label"></label>
-                    <input asp-for="EventDate" type="date" class="form-control" />
+                    <input asp-for="EventDate" type="text" class="form-control" id="eventDateInput" placeholder="Select a date" />
                     <span asp-validation-for="EventDate" class="text-danger"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="StartTime" class="form-label"></label>
+                    <select asp-for="StartTime" class="form-select" id="startTimeSelect" disabled>
+                        <option value="">-- Select a date first --</option>
+                    </select>
+                    <span asp-validation-for="StartTime" class="text-danger"></span>
                 </div>
 
                 <div class="mb-3">
@@ -61,3 +79,116 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <script>
+        const durationInput = document.getElementById("durationInput");
+        const startTimeSelect = document.getElementById("startTimeSelect");
+        const eventDateInput = document.getElementById("eventDateInput");
+
+        let fullyBookedDates = [];
+        let selectedDate = "";
+        let datePickerInstance;
+
+        async function loadFullyBookedDates() {
+            const durationHours = durationInput.value;
+
+            if (!durationHours || durationHours < 1) {
+                fullyBookedDates = [];
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Booking/GetFullyBookedDates?durationHours=${durationHours}`);
+                fullyBookedDates = await response.json();
+                initializeOrUpdateDatePicker();
+            } catch (error) {
+                console.error("Error loading fully booked dates:", error);
+            }
+        }
+
+        function initializeOrUpdateDatePicker() {
+            if (datePickerInstance) {
+                datePickerInstance.destroy();
+            }
+
+            datePickerInstance = flatpickr("#eventDateInput", {
+                dateFormat: "Y-m-d",
+                minDate: "today",
+                disable: [
+                    function (date) {
+                        const formatted = date.toISOString().split("T")[0];
+
+                        // Disable weekends
+                        if (date.getDay() === 0 || date.getDay() === 6) {
+                            return true;
+                        }
+
+                        // Disable fully booked dates
+                        return fullyBookedDates.includes(formatted);
+                    }
+                ],
+                onChange: function (selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                    availabilityNotice.textContent = "";
+                    loadAvailableTimeSlots();
+                }
+            });
+
+            if (selectedDate) {
+                datePickerInstance.setDate(selectedDate, true);
+            }
+        }
+
+        async function loadAvailableTimeSlots() {
+            const eventDate = eventDateInput.value;
+            const durationHours = durationInput.value;
+
+            startTimeSelect.innerHTML = '<option value="">-- Select a time --</option>';
+            startTimeSelect.disabled = true;
+
+            if (!eventDate || !durationHours || durationHours < 1) {
+                startTimeSelect.innerHTML = '<option value="">-- Select a date first --</option>';
+                return;
+            }
+
+            try {
+                const response = await fetch(`/Booking/GetAvailableTimeSlots?eventDate=${eventDate}&durationHours=${durationHours}`);
+                const slots = await response.json();
+
+                if (slots.length === 0) {
+                    const option = document.createElement("option");
+                    option.value = "";
+                    option.textContent = "No available times";
+                    startTimeSelect.appendChild(option);
+                    return;
+                }
+
+                startTimeSelect.disabled = false;
+
+                slots.forEach(slot => {
+                    const option = document.createElement("option");
+                    option.value = slot;
+                    option.textContent = slot;
+                    startTimeSelect.appendChild(option);
+                });
+            } catch (error) {
+                console.error("Error loading available time slots:", error);
+            }
+        }
+
+        const availabilityNotice = document.getElementById("availabilityNotice");
+
+        durationInput.addEventListener("input", async function () {
+            selectedDate = "";
+            eventDateInput.value = "";
+            startTimeSelect.innerHTML = '<option value="">-- Select a date first --</option>';
+            startTimeSelect.disabled = true;
+            availabilityNotice.textContent = "Available dates have been refreshed for the selected duration.";
+
+            await loadFullyBookedDates();
+        });
+
+        loadFullyBookedDates();
+    </script>
+}

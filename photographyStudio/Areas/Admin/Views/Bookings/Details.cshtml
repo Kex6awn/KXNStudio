@@ -11,6 +11,8 @@
 <div class="mb-3"><strong>Phone: </strong>@Model.PhoneNumber</div>
 <div class="mb-3"><strong>Service: </strong>@Model.ServiceType</div>
 <div class="mb-3"><strong>Date: </strong>@Model.EventDate.ToShortDateString()</div>
+<div class="mb-3"><strong>Start Time: </strong>@Model.StartTime.ToString(@"hh\:mm")</div>
+<div class="mb-3"><strong>Duration: </strong>@Model.DurationHours hour(s)</div>
 <div class="mb-3"><strong>Message: </strong>@Model.Message</div>
 <div class="mb-3"><strong>Status: </strong>@Model.Status</div>
 

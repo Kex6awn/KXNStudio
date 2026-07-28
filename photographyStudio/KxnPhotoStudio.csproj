@@ -4,9 +4,11 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>cffa1302-af3a-40e2-979a-6b1f5c905b7d</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.15.1" />
     <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.23" />
     <!--<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.23" /> -->
     <!--<PackageReference Include="Microsoft.AspNetCore.Identity.UI" Version="8.0.23" /> -->

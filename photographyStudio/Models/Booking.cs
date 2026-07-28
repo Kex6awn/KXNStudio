@@ -26,6 +26,12 @@ namespace KxnPhotoStudio.Models
         [Required]
         public DateTime EventDate { get; set; }
 
+        [Required]
+        public TimeSpan StartTime { get; set; }
+
+        [Range(1, 12)]
+        public int DurationHours { get; set; }
+
         [StringLength(1000)]
         public string? Message { get; set; }
 

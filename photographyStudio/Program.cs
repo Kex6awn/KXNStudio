@@ -1,4 +1,6 @@
 using Microsoft.EntityFrameworkCore;
+using KxnPhotoStudio.Services;
+using KxnPhotoStudio.Models;
 using KxnPhotoStudio.Data;
 using Microsoft.AspNetCore.Identity;
 using System.Threading.Tasks;
@@ -33,6 +35,10 @@ namespace KxnPhotoStudio
                 options.LoginPath = "/Admin/Auth/Login";
                 options.LogoutPath = "/Admin/Auth/Logout";
             });
+
+            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+
+            builder.Services.AddScoped<IEmailService, EmailService>();
 
             var app = builder.Build();
 

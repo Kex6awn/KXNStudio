@@ -64,3 +64,21 @@ html {
 body {
   margin-bottom: 60px;
 }
+
+/*Flatpickr (Calendar Styles) */
+
+.flatpickr-day.flatpickr-disabled,
+.flatpickr-day.flatpickr-disabled:hover {
+    background: #f1f1f1;
+    color: #bbb;
+    cursor: not-allowed;
+}
+
+.flatpickr-day.today {
+    border-color: #212529;
+}
+
+.flatpickr-day.selected {
+    background: #212529;
+    border-color: #212529;
+}
