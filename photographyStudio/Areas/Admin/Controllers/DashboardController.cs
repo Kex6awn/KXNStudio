@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using KxnPhotoStudio.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
@@ -7,9 +8,20 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
     [Authorize]
     public class DashboardController : Controller
     {
-        public IActionResult Index()
+        private readonly IDashboardService _dashboardService;
+
+        public DashboardController(
+            IDashboardService dashboardService)
         {
-            return View();
+            _dashboardService = dashboardService;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            var model =
+                await _dashboardService.GetDashboardAsync();
+
+            return View(model);
         }
     }
 }

@@ -1,6 +1,314 @@
-﻿@{
-    ViewData["Title"] = "Dashboard";
+﻿@model KxnPhotoStudio.Models.ViewModels.AdminDashboardViewModel
+
+@{
+    ViewData["Title"] = "Admin Dashboard";
 }
 
-<h1>Admin Dashboard</h1>
-<p>This is the admin area.</p>
+<div class="container-fluid py-4">
+
+    <div class="mb-4">
+        <h1 class="fw-bold">Admin Dashboard</h1>
+        <p class="text-muted mb-0">
+            Overview of your photography studio bookings.
+        </p>
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Total Bookings</p>
+                    <h2 class="fw-bold mb-0">@Model.TotalBookings</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Pending</p>
+                    <h2 class="fw-bold text-warning mb-0">
+                        @Model.PendingBookings
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Approved</p>
+                    <h2 class="fw-bold text-success mb-0">
+                        @Model.ConfirmedBookings
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Declined</p>
+                    <h2 class="fw-bold text-danger mb-0">
+                        @Model.DeclinedBookings
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Cancelled</p>
+                    <h2 class="fw-bold text-secondary mb-0">
+                        @Model.CancelledBookings
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Bookings This Month</p>
+                    <h2 class="fw-bold mb-0">
+                        @Model.BookingsThisMonth
+                    </h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-xl-6">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body">
+                    <p class="text-muted mb-2">Most Popular Service</p>
+                    <h3 class="fw-bold mb-0">
+                        @Model.MostPopularService
+                    </h3>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <div>
+                <h4 class="mb-1 fw-bold">Recent Bookings</h4>
+                <p class="text-muted mb-0">
+                    The five most recently submitted bookings.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Bookings"
+               asp-action="Index"
+               class="btn btn-dark">
+                View All
+            </a>
+        </div>
+
+        <div class="card-body p-0">
+            @if (Model.RecentBookings.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Customer</th>
+                                <th>Service</th>
+                                <th>Event Date</th>
+                                <th>Time</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var booking in Model.RecentBookings)
+                            {
+
+                                var formattedTime = DateTime.Today
+                                .Add(booking.StartTime)
+                                .ToString("h:mm tt");
+
+                                var badgeClass = booking.Status switch
+                                {
+                                    "Pending" => "bg-warning text-dark",
+                                    "Confirmed" => "bg-success",
+                                    "Declined" => "bg-danger",
+                                    "Cancelled" => "bg-secondary",
+                                    _ => "bg-dark"
+                                };
+
+                                <tr>
+                                    <td class="ps-4">
+                                        <div class="fw-semibold">
+                                            @booking.FullName
+                                        </div>
+
+                                        <small class="text-muted">
+                                            @booking.Email
+                                        </small>
+                                    </td>
+
+                                    <td>
+                                        @booking.ServiceType
+                                    </td>
+
+                                    <td>
+                                        @booking.EventDate.ToString("MMM dd, yyyy")
+                                    </td>
+
+                                    <td>
+                                        @formattedTime
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @badgeClass">
+                                            @booking.Status
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end pe-4">
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Details"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm btn-info">
+                                            View
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Edit"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm btn-primary">
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h5 class="text-muted">No bookings yet</h5>
+                    <p class="text-muted mb-0">
+                        New booking requests will appear here.
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="card shadow-sm border-0 mt-4">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center py-3">
+            <div>
+                <h4 class="mb-1 fw-bold">Upcoming Sessions</h4>
+                <p class="text-muted mb-0">
+                    Your next five confirmed photography sessions.
+                </p>
+            </div>
+
+            <a asp-area="Admin"
+               asp-controller="Bookings"
+               asp-action="Index"
+               class="btn btn-dark">
+                View All Bookings
+            </a>
+        </div>
+
+        <div class="card-body">
+            @if (Model.UpcomingSessions.Any())
+            {
+                <div class="row g-3">
+                    @foreach (var booking in Model.UpcomingSessions)
+                    {
+                        var formattedTime = DateTime.Today
+                        .Add(booking.StartTime)
+                        .ToString("h:mm tt");
+
+                        <div class="col-md-6 col-xl-4">
+                            <div class="border rounded-3 p-3 h-100">
+                                <div class="d-flex justify-content-between align-items-start mb-3">
+                                    <div>
+                                        <div class="fw-bold fs-5">
+                                            @booking.EventDate.ToString("MMM dd")
+                                        </div>
+
+                                        <div class="text-muted">
+                                            @booking.EventDate.ToString("dddd")
+                                        </div>
+                                    </div>
+
+                                    <span class="badge bg-success">
+                                        Confirmed
+                                    </span>
+                                </div>
+
+                                <h5 class="fw-bold mb-1">
+                                    @booking.ServiceType
+                                </h5>
+
+                                <p class="mb-1">
+                                    @booking.FullName
+                                </p>
+
+                                <p class="text-muted mb-3">
+                                    @formattedTime
+                                    ·
+                                    @booking.DurationHours hour(s)
+                                </p>
+
+                                <div class="d-flex gap-2">
+                                    <a asp-area="Admin"
+                                       asp-controller="Bookings"
+                                       asp-action="Details"
+                                       asp-route-id="@booking.BookingId"
+                                       class="btn btn-sm btn-info">
+                                        View
+                                    </a>
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Bookings"
+                                       asp-action="Edit"
+                                       asp-route-id="@booking.BookingId"
+                                       class="btn btn-sm btn-primary">
+                                        Edit
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <h5 class="text-muted">
+                        No upcoming confirmed sessions
+                    </h5>
+
+                    <p class="text-muted mb-0">
+                        Confirmed future bookings will appear here.
+                    </p>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Index"
+           class="btn btn-dark">
+            Manage Bookings
+        </a>
+    </div>
+
+</div>

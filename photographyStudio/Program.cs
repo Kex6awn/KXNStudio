@@ -39,6 +39,7 @@ namespace KxnPhotoStudio
             builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddScoped<IEmailService, EmailService>();
+            builder.Services.AddScoped<IDashboardService, DashboardService>();
 
             var app = builder.Build();
 

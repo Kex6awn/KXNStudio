@@ -142,12 +142,12 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
             switch (normalizedStatus)
             {
-                case "approved":
-                    subject = "Your Booking Has Been Approved - KXN Photo Studio";
-                    heading = "Your booking is approved!";
+                case "confirmed":
+                    subject = "Your Booking Has Been Confirmed - KXN Photo Studio";
+                    heading = "Your booking is confirmed!";
                     message =
-                        "We’re pleased to confirm that your photography session has been approved.";
-                    statusText = "Approved";
+                        "We’re pleased to confirm that your photography session has been accepted and reserved.";
+                    statusText = "Confirmed";
                     statusBackground = "#d1e7dd";
                     statusColor = "#0f5132";
                     break;
