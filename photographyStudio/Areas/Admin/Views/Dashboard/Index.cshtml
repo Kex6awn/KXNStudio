@@ -16,80 +16,264 @@
     <div class="row g-4">
 
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-total shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Total Bookings</p>
-                    <h2 class="fw-bold mb-0">@Model.TotalBookings</h2>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Total Bookings</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.TotalBookings
+                            </h2>
+                        </div>
+
+                        <div class="dashboard-icon bg-primary-subtle text-primary">
+                            <i class="bi bi-calendar-check"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        @Model.BookingsThisMonth new this month
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-pending shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Pending</p>
-                    <h2 class="fw-bold text-warning mb-0">
-                        @Model.PendingBookings
-                    </h2>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Pending</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.PendingBookings
+                            </h2>
+                        </div>
+
+                        <div class="dashboard-icon bg-warning-subtle text-warning">
+                            <i class="bi bi-hourglass-split"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Waiting for review
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-confirmed shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Approved</p>
-                    <h2 class="fw-bold text-success mb-0">
-                        @Model.ConfirmedBookings
-                    </h2>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Confirmed</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.ConfirmedBookings
+                            </h2>
+                        </div>
+
+                        <div class="dashboard-icon bg-success-subtle text-success">
+                            <i class="bi bi-check-circle"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Approved photography sessions
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-declined shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Declined</p>
-                    <h2 class="fw-bold text-danger mb-0">
-                        @Model.DeclinedBookings
-                    </h2>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Declined</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.DeclinedBookings
+                            </h2>
+                        </div>
+
+                        <div class="dashboard-icon bg-danger-subtle text-danger">
+                            <i class="bi bi-slash-circle"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Requests that were declined
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-cancelled shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Cancelled</p>
-                    <h2 class="fw-bold text-secondary mb-0">
-                        @Model.CancelledBookings
-                    </h2>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Cancelled</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.CancelledBookings
+                            </h2>
+                        </div>
+
+                        <div class="dashboard-icon bg-secondary-subtle text-secondary">
+                            <i class="bi bi-x-circle"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Cancelled photography sessions
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-month shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Bookings This Month</p>
-                    <h2 class="fw-bold mb-0">
-                        @Model.BookingsThisMonth
-                    </h2>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Bookings This Month</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.BookingsThisMonth
+                            </h2>
+                        </div>
+
+                        <div class="dashboard-icon bg-info-subtle text-info">
+                            <i class="bi bi-calendar-month"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Requests received this month
+                    </p>
                 </div>
             </div>
         </div>
 
         <div class="col-md-12 col-xl-6">
-            <div class="card shadow-sm border-0 h-100">
+            <div class="card dashboard-stat-card card-service shadow-sm border-0 h-100">
                 <div class="card-body">
-                    <p class="text-muted mb-2">Most Popular Service</p>
-                    <h3 class="fw-bold mb-0">
-                        @Model.MostPopularService
-                    </h3>
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <p class="text-muted mb-2">Most Popular Service</p>
+                            <h3 class="fw-bold mb-0">
+                                @Model.MostPopularService
+                            </h3>
+                        </div>
+
+                        <div class="dashboard-icon bg-dark-subtle text-dark">
+                            <i class="bi bi-camera"></i>
+                        </div>
+                    </div>
+
+                    <p class="small text-muted mt-3 mb-0">
+                        Based on all booking requests
+                    </p>
                 </div>
             </div>
         </div>
+    </div>
 
+    <div class="card quick-actions-card shadow-sm border-0 mt-4">
+        <div class="card-body p-4">
+            <div class="mb-4">
+                <h4 class="fw-bold mb-1">
+                    <i class="bi bi-lightning-charge-fill me-2 text-warning"></i>
+                    Quick Actions
+                </h4>
+
+                <p class="text-muted mb-0">
+                    Quickly access the most common admin tasks.
+                </p>
+            </div>
+
+            <div class="row g-3">
+
+                <div class="col-sm-6 col-xl-3">
+                    <a asp-area=""
+                       asp-controller="Booking"
+                       asp-action="Create"
+                       class="quick-action-link">
+                        <div class="quick-action-item">
+                            <div class="quick-action-icon bg-success-subtle text-success">
+                                <i class="bi bi-calendar-plus"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-bold mb-1">New Booking</h6>
+                                <p class="small text-muted mb-0">
+                                    Create a booking manually
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <a asp-area="Admin"
+                       asp-controller="Bookings"
+                       asp-action="Index"
+                       class="quick-action-link">
+                        <div class="quick-action-item">
+                            <div class="quick-action-icon bg-primary-subtle text-primary">
+                                <i class="bi bi-calendar-week"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-bold mb-1">Manage Bookings</h6>
+                                <p class="small text-muted mb-0">
+                                    Review and update requests
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <a asp-area="Admin"
+                       asp-controller="Photos"
+                       asp-action="Index"
+                       class="quick-action-link">
+                        <div class="quick-action-item">
+                            <div class="quick-action-icon bg-info-subtle text-info">
+                                <i class="bi bi-images"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-bold mb-1">Manage Portfolio</h6>
+                                <p class="small text-muted mb-0">
+                                    Upload and organize photos
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <a asp-area="Admin"
+                       asp-controller="Categories"
+                       asp-action="Index"
+                       class="quick-action-link">
+                        <div class="quick-action-item">
+                            <div class="quick-action-icon bg-warning-subtle text-warning">
+                                <i class="bi bi-folder"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-bold mb-1">Categories</h6>
+                                <p class="small text-muted mb-0">
+                                    Manage portfolio categories
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+            </div>
+        </div>
     </div>
 
     <div class="card shadow-sm border-0 mt-4">
@@ -312,3 +496,108 @@
     </div>
 
 </div>
+
+@section Styles {
+    <style>
+        .dashboard-stat-card {
+            border-radius: 16px;
+            min-height: 180px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .dashboard-stat-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 0.75rem 1.5rem rgba(0, 0, 0, 0.08) !important;
+        }
+
+        .dashboard-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.8rem;
+        }
+
+        .dashboard-stat-card h2 {
+            font-size: 2.7rem;
+            font-weight: 700;
+        }
+
+        .dashboard-stat-card h3 {
+            font-size: 1.6rem;
+        }
+
+        .card-total {
+            border-top: 5px solid #0d6efd !important;
+        }
+
+        .card-pending {
+            border-top: 5px solid #ffc107 !important;
+        }
+
+        .card-confirmed {
+            border-top: 5px solid #198754 !important;
+        }
+
+        .card-declined {
+            border-top: 5px solid #dc3545 !important;
+        }
+
+        .card-cancelled {
+            border-top: 5px solid #6c757d !important;
+        }
+
+        .card-month {
+            border-top: 5px solid #0dcaf0 !important;
+        }
+
+        .card-service {
+            border-top: 5px solid #212529 !important;
+        }
+
+        .quick-actions-card {
+            border-radius: 16px;
+        }
+
+        .quick-action-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .quick-action-item {
+            min-height: 110px;
+            height: 100%;
+            padding: 18px;
+            border: 1px solid #e9ecef;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+            .quick-action-item:hover {
+                transform: translateY(-3px);
+                border-color: #ced4da;
+                box-shadow: 0 0.65rem 1.25rem rgba(0, 0, 0, 0.08);
+            }
+
+        .quick-action-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.35rem;
+        }
+
+        .quick-action-item h6 {
+            color: #212529;
+        }
+    </style>
+}
