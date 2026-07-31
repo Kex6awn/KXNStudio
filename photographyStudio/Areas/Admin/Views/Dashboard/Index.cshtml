@@ -215,6 +215,27 @@
                 <div class="col-sm-6 col-xl-3">
                     <a asp-area="Admin"
                        asp-controller="Bookings"
+                       asp-action="Calendar"
+                       class="quick-action-link">
+
+                        <div class="quick-action-item">
+                            <div class="quick-action-icon bg-danger-subtle text-danger">
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="fw-bold mb-1">Booking Calendar</h6>
+                                <p class="small text-muted mb-0">
+                                    View sessions by date
+                                </p>
+                            </div>
+                        </div>
+                    </a>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <a asp-area="Admin"
+                       asp-controller="Bookings"
                        asp-action="Index"
                        class="quick-action-link">
                         <div class="quick-action-item">

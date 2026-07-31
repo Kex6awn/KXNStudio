@@ -61,6 +61,33 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             return View(model);
         }
 
+        [HttpGet]
+        public async Task<IActionResult> GetCalendarEvents()
+        {
+            var bookings = await _context.Bookings.Where(b => b.Status == "Confirmed" || b.Status == "Pending")
+                                                    .Select(b => new {id = b.BookingId, title = b.ServiceType + " - " + b.FullName,
+                                                    start = b.EventDate.Add(b.StartTime).ToString("yyyy-MM-ddTHH:mm:ss"),
+                                                    
+                                                    end = b.EventDate.Add(b.StartTime).AddHours(b.DurationHours).ToString("yyyy-MM-ddTHH:mm:ss"),
+                                                    
+                                                    status = b.Status,
+                                                    
+                                                    url = Url.Action("Details", "Bookings",
+                                                    new
+                                                    {
+                                                        area = "Admin",
+                                                        id = b.BookingId
+                                                    })
+                                                }).ToListAsync();
+            return Json(bookings);
+        }
+
+        // Calendar Action
+        public IActionResult Calendar()
+        {
+            return View();
+        }
+
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, BookingStatusViewModel model)
