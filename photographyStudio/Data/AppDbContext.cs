@@ -12,13 +12,21 @@ namespace KxnPhotoStudio.Data
         public DbSet<Category> Categories => Set<Category>();
         public DbSet<Photo> Photos => Set<Photo>();
 
+        public DbSet<Client> Clients => Set<Client>();
+
         public DbSet<Booking> Bookings => Set<Booking>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
-            // Optional: seed starter categories
+            modelBuilder.Entity<Client>()
+                .HasMany(c => c.Bookings)
+                .WithOne(b => b.Client)
+                .HasForeignKey(b => b.ClientId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // seed starter categories
 
             modelBuilder.Entity<Category>().HasData(
                 new Category { CategoryId = 1, Name = "Potraits"},

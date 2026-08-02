@@ -7,6 +7,9 @@ namespace KxnPhotoStudio.Models
     {
         public int BookingId { get; set; }
 
+        public int? ClientId { get; set; }
+        public Client? Client { get; set; }
+
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;
@@ -39,5 +42,6 @@ namespace KxnPhotoStudio.Models
         public string Status { get; set; } = "Pending";
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+
     }
 }
