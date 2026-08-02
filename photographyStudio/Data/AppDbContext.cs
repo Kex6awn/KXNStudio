@@ -20,6 +20,8 @@ namespace KxnPhotoStudio.Data
         {
             base.OnModelCreating(modelBuilder);
 
+            modelBuilder.Entity<Client>().HasIndex(c => c.Email).IsUnique();
+
             modelBuilder.Entity<Client>()
                 .HasMany(c => c.Bookings)
                 .WithOne(b => b.Client)

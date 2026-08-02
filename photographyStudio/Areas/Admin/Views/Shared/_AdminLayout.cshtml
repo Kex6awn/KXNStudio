@@ -69,6 +69,15 @@
                         </a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link @(currentController == "Clients" ? "active fw-semibold" : "")"
+                           asp-area="Admin"
+                           asp-controller="Clients"
+                           asp-action="Index">
+                            <!--<i class="bi bi-people me-1"></i>-->
+                            Clients
+                        </a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">View Site</a>
                     </li>
                     <li class="nav-item">

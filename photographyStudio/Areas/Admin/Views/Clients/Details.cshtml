@@ -1,0 +1,221 @@
+﻿@model KxnPhotoStudio.Models.Client
+
+@{
+    ViewData["Title"] = "Client Details";
+
+    var confirmedCount = Model.Bookings.Count(b => b.Status == "Confirmed");
+    var pendingCount = Model.Bookings.Count(b => b.Status == "Pending");
+    var cancelledCount = Model.Bookings.Count(b => b.Status == "Cancelled");
+}
+
+<div class="container-fluid py-4">
+
+    <div class="d-flex justify-content-between align-items-start mb-4">
+        <div>
+            <h1 class="fw-bold mb-1">@Model.FullName</h1>
+            <p class="text-muted mb-0">
+                Client profile and booking history.
+            </p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Clients"
+           asp-action="Index"
+           class="btn btn-secondary">
+            Back to Clients
+        </a>
+    </div>
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-lg-4">
+            <div class="card shadow-sm border-0 h-100">
+                <div class="card-body p-4">
+                    <h4 class="fw-bold mb-4">Contact Information</h4>
+
+                    <p class="text-muted mb-1">Email</p>
+                    <p>
+                        <a href="mailto:@Model.Email"
+                           class="text-decoration-none">
+                            @Model.Email
+                        </a>
+                    </p>
+
+                    <p class="text-muted mb-1">Phone</p>
+                    <p>
+                        @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+                        {
+                            <a href="tel:@Model.PhoneNumber"
+                               class="text-decoration-none">
+                                @Model.PhoneNumber
+                            </a>
+                        }
+                        else
+                        {
+                            <span>Not provided</span>
+                        }
+                    </p>
+
+                    <p class="text-muted mb-1">Client Since</p>
+                    <p class="mb-0">
+                        @Model.CreatedAt.ToString("MMMM dd, yyyy")
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-8">
+            <div class="row g-3">
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-2">Total Bookings</p>
+                            <h2 class="fw-bold mb-0">
+                                @Model.Bookings.Count
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-2">Confirmed</p>
+                            <h2 class="fw-bold text-success mb-0">
+                                @confirmedCount
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-2">Pending</p>
+                            <h2 class="fw-bold text-warning mb-0">
+                                @pendingCount
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-sm-6 col-xl-3">
+                    <div class="card shadow-sm border-0 h-100">
+                        <div class="card-body">
+                            <p class="text-muted mb-2">Cancelled</p>
+                            <h2 class="fw-bold text-secondary mb-0">
+                                @cancelledCount
+                            </h2>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <div class="card shadow-sm border-0">
+
+        <div class="card-header bg-white py-3">
+            <h4 class="fw-bold mb-1">Booking History</h4>
+            <p class="text-muted mb-0">
+                All bookings connected to this client.
+            </p>
+        </div>
+
+        <div class="card-body p-0">
+
+            @if (Model.Bookings.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+
+                        <thead class="table-light">
+                            <tr>
+                                <th class="ps-4">Service</th>
+                                <th>Date</th>
+                                <th>Time</th>
+                                <th>Duration</th>
+                                <th>Status</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @foreach (var booking in Model.Bookings)
+                            {
+                                var formattedTime = DateTime.Today
+                                .Add(booking.StartTime)
+                                .ToString("h:mm tt");
+
+                                var badgeClass = booking.Status switch
+                                {
+                                    "Pending" => "bg-warning text-dark",
+                                    "Confirmed" => "bg-success",
+                                    "Declined" => "bg-danger",
+                                    "Cancelled" => "bg-secondary",
+                                    _ => "bg-dark"
+                                };
+
+                                <tr>
+                                    <td class="ps-4 fw-semibold">
+                                        @booking.ServiceType
+                                    </td>
+
+                                    <td>
+                                        @booking.EventDate.ToString("MMM dd, yyyy")
+                                    </td>
+
+                                    <td>
+                                        @formattedTime
+                                    </td>
+
+                                    <td>
+                                        @booking.DurationHours hour(s)
+                                    </td>
+
+                                    <td>
+                                        <span class="badge @badgeClass">
+                                            @booking.Status
+                                        </span>
+                                    </td>
+
+                                    <td class="text-end pe-4">
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Details"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm btn-info">
+                                            View
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Edit"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm btn-primary">
+                                            Edit
+                                        </a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <p class="text-muted mb-0">
+                        This client has no booking history.
+                    </p>
+                </div>
+            }
+
+        </div>
+    </div>
+
+</div>
