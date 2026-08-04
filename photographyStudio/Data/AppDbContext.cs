@@ -31,7 +31,7 @@ namespace KxnPhotoStudio.Data
                 .OnDelete(DeleteBehavior.Restrict);
 
             modelBuilder.Entity<Client>()
-                .HasMany(client => client.ClientNotes)
+                .HasMany(client => client.Notes)
                 .WithOne(note => note.Client)
                 .HasForeignKey(note => note.ClientId)
                 .OnDelete(DeleteBehavior.Cascade);

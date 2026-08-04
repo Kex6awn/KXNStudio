@@ -2,7 +2,6 @@
 using KxnPhotoStudio.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
 {
@@ -17,31 +16,35 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             _context = context;
         }
 
-        // GET: Create
-        public IActionResult Create(int clientId)
-        {
-            var note = new ClientNote
-            {
-                ClientId = clientId
-            };
-
-            return View(note);
-        }
-
-        // POST: Create
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ClientNote note)
+        public async Task<IActionResult> Create(int clientId, string content)
         {
-            if (!ModelState.IsValid)
+            var clientExists = await _context.Clients.FindAsync(clientId);
+
+            if (clientExists == null)
             {
-                return View(note);
+                return NotFound();
             }
 
-            note.CreatedAt = DateTime.UtcNow;
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                TempData["ErrorMessage"] = "The note cannot be empty.";
+
+                return RedirectToAction(
+                    "Details",
+                    "Clients",
+                    new { area = "Admin", id = clientId });
+            }
+
+            var note = new ClientNote
+            {
+                ClientId = clientId,
+                Content = content.Trim(),
+                CreatedAt = DateTime.UtcNow
+            };
 
             _context.ClientNotes.Add(note);
-
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Client note added successfully.";
@@ -49,90 +52,59 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             return RedirectToAction(
                 "Details",
                 "Clients",
-                new
-                {
-                    area = "Admin",
-                    id = note.ClientId
-                });
+                new { area = "Admin", id = clientId });
         }
 
-        // GET: Edit
-        public async Task<IActionResult> Edit(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var note = await _context.ClientNotes.FindAsync(id);
-
-            if (note == null)
-                return NotFound();
-
-            return View(note);
-        }
-
-        // POST: Edit
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, ClientNote note)
+        public async Task<IActionResult> Edit(
+            int clientNoteId,
+            string content)
         {
-            if (id != note.ClientNoteId)
+            var note = await _context.ClientNotes.FindAsync(clientNoteId);
+
+            if (note == null)
+            {
                 return NotFound();
+            }
 
-            if (!ModelState.IsValid)
-                return View(note);
+            if (string.IsNullOrWhiteSpace(content))
+            {
+                TempData["ErrorMessage"] = "The note cannot be empty.";
 
-            var existing = await _context.ClientNotes.FindAsync(id);
+                return RedirectToAction(
+                    "Details",
+                    "Clients",
+                    new { area = "Admin", id = note.ClientId });
+            }
 
-            if (existing == null)
-                return NotFound();
-
-            existing.Content = note.Content;
-            existing.UpdatedAt = DateTime.UtcNow;
+            note.Content = content.Trim();
+            note.UpdatedAt = DateTime.UtcNow;
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Client note updated.";
+            TempData["SuccessMessage"] = "Client note updated successfully.";
 
             return RedirectToAction(
                 "Details",
                 "Clients",
-                new
-                {
-                    area = "Admin",
-                    id = existing.ClientId
-                });
+                new { area = "Admin", id = note.ClientId });
         }
 
-        // GET: Delete
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null)
-                return NotFound();
-
-            var note = await _context.ClientNotes
-                .Include(n => n.Client)
-                .FirstOrDefaultAsync(n => n.ClientNoteId == id);
-
-            if (note == null)
-                return NotFound();
-
-            return View(note);
-        }
-
-        // POST: Delete
-        [HttpPost, ActionName("Delete")]
+        [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        public async Task<IActionResult> Delete(int clientNoteId)
         {
-            var note = await _context.ClientNotes.FindAsync(id);
+            var note = await _context.ClientNotes.FindAsync(clientNoteId);
 
             if (note == null)
+            {
                 return NotFound();
+            }
 
             var clientId = note.ClientId;
 
             _context.ClientNotes.Remove(note);
-
             await _context.SaveChangesAsync();
 
             TempData["SuccessMessage"] = "Client note deleted.";
@@ -140,11 +112,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             return RedirectToAction(
                 "Details",
                 "Clients",
-                new
-                {
-                    area = "Admin",
-                    id = clientId
-                });
+                new { area = "Admin", id = clientId });
         }
     }
 }

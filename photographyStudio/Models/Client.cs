@@ -23,6 +23,6 @@ namespace KxnPhotoStudio.Models
 
         public List<Booking> Bookings { get; set; } = new();
 
-        public List<ClientNote> ClientNotes { get; set; } = new();
+        public List<ClientNote> Notes { get; set; } = new();
     }
 }

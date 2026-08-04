@@ -33,14 +33,24 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                 return NotFound();
             }
 
-            var client = await _context.Clients.Include(c => c.Bookings).FirstOrDefaultAsync(c => c.ClientId == id);
+            var client = await _context.Clients
+                .Include(c => c.Bookings)
+                .Include(c => c.Notes)
+                .FirstOrDefaultAsync(c => c.ClientId == id);
 
             if (client == null)
             {
                 return NotFound();
             }
 
-            client.Bookings = client.Bookings.OrderByDescending(b => b.EventDate).ThenByDescending(b => b.StartTime).ToList();
+            client.Bookings = client.Bookings
+                .OrderByDescending(b => b.EventDate)
+                .ThenByDescending(b => b.StartTime)
+                .ToList();
+
+            client.Notes = client.Notes
+                .OrderByDescending(n => n.CreatedAt)
+                .ToList();
 
             return View(client);
         }
