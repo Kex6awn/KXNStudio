@@ -22,5 +22,7 @@ namespace KxnPhotoStudio.Models
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
         public List<Booking> Bookings { get; set; } = new();
+
+        public List<ClientNote> ClientNotes { get; set; } = new();
     }
 }
