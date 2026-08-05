@@ -11,12 +11,14 @@ namespace KxnPhotoStudio.Controllers
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
+        private readonly IClientService _clientService;
 
-        public BookingController(AppDbContext context, IEmailService emailService, IConfiguration configuration)
+        public BookingController(AppDbContext context, IEmailService emailService, IConfiguration configuration, IClientService clientService)
         {
             _context = context;
             _emailService = emailService;
             _configuration = configuration;
+            _clientService = clientService;
         }
 
         [HttpGet]
@@ -177,35 +179,7 @@ namespace KxnPhotoStudio.Controllers
             booking.Status = "Pending";
             booking.CreatedAt = DateTime.UtcNow;
 
-            var normalizedEmail = booking.Email.Trim().ToLowerInvariant();
-
-            var client = await _context.Clients
-                .FirstOrDefaultAsync(c => c.Email.ToLower() == normalizedEmail);
-
-            if (client == null)
-            {
-                client = new Client
-                {
-                    FullName = booking.FullName.Trim(),
-                    Email = booking.Email.Trim(),
-                    PhoneNumber = booking.PhoneNumber?.Trim(),
-                    CreatedAt = DateTime.UtcNow
-                };
-
-                _context.Clients.Add(client);
-
-                await _context.SaveChangesAsync();
-            }
-            else
-            {
-                // Keep the client profile current when they book again
-                client.FullName = booking.FullName.Trim();
-
-                if (!string.IsNullOrWhiteSpace(booking.PhoneNumber))
-                {
-                    client.PhoneNumber = booking.PhoneNumber.Trim();
-                }
-            }
+            var client = await _clientService.GetOrCreateClientAsync(booking);
 
             booking.ClientId = client.ClientId;
 
