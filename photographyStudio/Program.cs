@@ -3,7 +3,7 @@ using KxnPhotoStudio.Services;
 using KxnPhotoStudio.Models;
 using KxnPhotoStudio.Data;
 using Microsoft.AspNetCore.Identity;
-using System.Threading.Tasks;
+//using System.Threading.Tasks;
 
 namespace KxnPhotoStudio
 {
@@ -40,6 +40,7 @@ namespace KxnPhotoStudio
 
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
+            builder.Services.AddScoped<IClientService, ClientService>();
 
             var app = builder.Build();
 
