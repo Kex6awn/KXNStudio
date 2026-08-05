@@ -11,14 +11,18 @@ namespace KxnPhotoStudio.Controllers
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IConfiguration _configuration;
-        private readonly IClientService _clientService;
+        private readonly IBookingService _bookingService;
 
-        public BookingController(AppDbContext context, IEmailService emailService, IConfiguration configuration, IClientService clientService)
+        public BookingController(
+            AppDbContext context,
+            IEmailService emailService,
+            IConfiguration configuration,
+            IBookingService bookingService)
         {
             _context = context;
             _emailService = emailService;
             _configuration = configuration;
-            _clientService = clientService;
+            _bookingService = bookingService;
         }
 
         [HttpGet]
@@ -133,58 +137,21 @@ namespace KxnPhotoStudio.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Booking booking)
         {
-            if (booking.EventDate.Date < DateTime.Today)
-            {
-                ModelState.AddModelError("EventDate", "Please select a future date.");
-            }
-
-            var businessStart = new TimeSpan(9, 0, 0); //9:00 AM
-            var businessEnd = new TimeSpan(18, 0, 0);  //6:00 AM
-
-            if (booking.StartTime < businessStart || booking.StartTime >= businessEnd)
-            {
-                ModelState.AddModelError("StartTime", "Bookings must be between 9:00 AM and 6:00 PM.");
-            }
-
-            var requestedEndTime = booking.StartTime.Add(TimeSpan.FromHours(booking.DurationHours));
-
-            if (requestedEndTime > businessEnd)
-            {
-                ModelState.AddModelError("DurationHours", "This booking extends past business hours.");
-            }
-
-            var existingBookings = await _context.Bookings
-                                    .Where(b => b.EventDate.Date == booking.EventDate.Date && b.Status != "Cancelled")
-                                    .ToListAsync();
-
-            foreach (var existing in existingBookings)
-            {
-                var existingStart = existing.StartTime;
-                var existingEnd = existing.StartTime.Add(TimeSpan.FromHours(existing.DurationHours));
-
-                bool overlaps = booking.StartTime < existingEnd && requestedEndTime > existingStart;
-
-                if (overlaps)
-                {
-                    ModelState.AddModelError(string.Empty, "That time slot is already booked. Please choose another time.");
-                    break;
-                }
-            }
-
             if (!ModelState.IsValid)
             {
                 return View(booking);
             }
 
-            booking.Status = "Pending";
-            booking.CreatedAt = DateTime.UtcNow;
+            var result = await _bookingService.CreateBookingAsync(booking);
 
-            var client = await _clientService.GetOrCreateClientAsync(booking);
+            if (!result.Succeeded)
+            {
+                ModelState.AddModelError(
+                    result.ErrorField ?? string.Empty,
+                    result.ErrorMessage ?? "The booking could not be created.");
 
-            booking.ClientId = client.ClientId;
-
-            _context.Bookings.Add(booking);
-            await _context.SaveChangesAsync();
+                return View(booking);
+            }
 
             var adminEmail = _configuration["EmailSettings:AdminEmail"];
 
