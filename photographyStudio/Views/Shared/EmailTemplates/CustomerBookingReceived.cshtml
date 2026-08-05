@@ -1,0 +1,174 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.BookingEmailViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Booking Confirmation</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f4f4; font-family:Arial, Helvetica, sans-serif;">
+
+    <table role="presentation"
+           width="100%"
+           cellspacing="0"
+           cellpadding="0"
+           border="0"
+           style="background-color:#f4f4f4; padding:30px 15px;">
+
+        <tr>
+            <td align="center">
+
+                <table role="presentation"
+                       width="100%"
+                       cellspacing="0"
+                       cellpadding="0"
+                       border="0"
+                       style="max-width:650px; background-color:#ffffff; border-radius:12px; overflow:hidden;
+                              box-shadow:0 4px 18px rgba(0,0,0,0.08);">
+
+                    <tr>
+                        <td style="background-color:#111111; padding:32px 25px; text-align:center;">
+
+                            <h1 style="margin:0; color:#ffffff; font-size:28px; letter-spacing:1px;">
+                                KXN Photo Studio
+                            </h1>
+
+                            <p style="margin:10px 0 0; color:#d6d6d6; font-size:15px;">
+                                Booking Request Received
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="padding:35px 30px;">
+
+                            <h2 style="margin:0 0 15px; color:#222222; font-size:23px;">
+                                Hi @Model.FullName,
+                            </h2>
+
+                            <p style="margin:0 0 18px; color:#555555; font-size:15px; line-height:1.7;">
+                                Thank you for choosing KXN Photo Studio.
+                            </p>
+
+                            <p style="margin:0 0 28px; color:#555555; font-size:15px; line-height:1.7;">
+                                We received your booking request successfully. Your request is currently pending review.
+                                We will contact you once it has been confirmed or if we need any additional information.
+                            </p>
+
+                            <table role="presentation"
+                                   width="100%"
+                                   cellspacing="0"
+                                   cellpadding="0"
+                                   border="0"
+                                   style="border-collapse:collapse; border:1px solid #e6e6e6;">
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold; width:35%;">
+                                        Service
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.ServiceType
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Date
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.FormattedDate
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Time
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.FormattedTime
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Duration
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.DurationHours hour(s)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8; font-weight:bold;">
+                                        Status
+                                    </td>
+
+                                    <td style="padding:14px 16px;">
+
+                                        <span style="display:inline-block; background-color:#fff3cd;
+                                                     color:#856404; padding:6px 12px; border-radius:20px;
+                                                     font-size:13px; font-weight:bold;">
+                                            Pending Review
+                                        </span>
+
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                            <div style="margin-top:28px; background-color:#f8f8f8;
+                                        border-left:4px solid #111111; padding:18px;">
+
+                                <p style="margin:0; color:#555555; font-size:14px; line-height:1.7;">
+                                    Please remember that this email confirms that we received your request.
+                                    Your session is not officially confirmed until you receive a confirmation email from us.
+                                </p>
+
+                            </div>
+
+                            <p style="margin:28px 0 0; color:#555555; font-size:15px; line-height:1.7;">
+                                Thank you for trusting KXN Photo Studio with your memories.
+                            </p>
+
+                            <p style="margin:22px 0 0; color:#222222; font-size:15px; line-height:1.7;">
+                                Sincerely,<br>
+                                <strong>KXN Photo Studio</strong>
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <tr>
+                        <td style="background-color:#111111; padding:22px; text-align:center;">
+
+                            <p style="margin:0; color:#bdbdbd; font-size:13px;">
+                                KXN Photo Studio
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>

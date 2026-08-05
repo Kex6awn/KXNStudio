@@ -1,0 +1,211 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.BookingEmailViewModel
+
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>New Booking Request</title>
+</head>
+
+<body style="margin:0; padding:0; background-color:#f4f4f4; font-family:Arial, Helvetica, sans-serif;">
+
+    <table role="presentation"
+           width="100%"
+           cellspacing="0"
+           cellpadding="0"
+           border="0"
+           style="background-color:#f4f4f4; padding:30px 15px;">
+
+        <tr>
+            <td align="center">
+
+                <table role="presentation"
+                       width="100%"
+                       cellspacing="0"
+                       cellpadding="0"
+                       border="0"
+                       style="max-width:650px; background-color:#ffffff; border-radius:12px; overflow:hidden;
+                              box-shadow:0 4px 18px rgba(0,0,0,0.08);">
+
+                    <!-- Header -->
+                    <tr>
+                        <td style="background-color:#111111; padding:32px 25px; text-align:center;">
+
+                            <h1 style="margin:0; color:#ffffff; font-size:28px; letter-spacing:1px;">
+                                KXN Photo Studio
+                            </h1>
+
+                            <p style="margin:10px 0 0; color:#d6d6d6; font-size:15px;">
+                                New Booking Request
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- Main Content -->
+                    <tr>
+                        <td style="padding:35px 30px;">
+
+                            <h2 style="margin:0 0 10px; color:#222222; font-size:23px;">
+                                You received a new booking
+                            </h2>
+
+                            <p style="margin:0 0 28px; color:#666666; font-size:15px; line-height:1.6;">
+                                A customer submitted a booking request through the KXN Photo Studio website.
+                            </p>
+
+                            <!-- Booking Details -->
+                            <table role="presentation"
+                                   width="100%"
+                                   cellspacing="0"
+                                   cellpadding="0"
+                                   border="0"
+                                   style="border-collapse:collapse; border:1px solid #e6e6e6; border-radius:8px;">
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold; width:35%;">
+                                        Customer
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.FullName
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Email
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        <a href="mailto:@Model.Email"
+                                           style="color:#111111; text-decoration:none;">
+                                            @Model.Email
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Phone
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        <a href="tel:@Model.PhoneNumber"
+                                           style="color:#111111; text-decoration:none;">
+                                            @Model.PhoneNumber
+                                        </a>
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Service
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.ServiceType
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Date
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.FormattedDate
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Time
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.FormattedTime
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               border-bottom:1px solid #e6e6e6; font-weight:bold;">
+                                        Duration
+                                    </td>
+
+                                    <td style="padding:14px 16px; border-bottom:1px solid #e6e6e6;">
+                                        @Model.DurationHours hour(s)
+                                    </td>
+                                </tr>
+
+                                <tr>
+                                    <td style="padding:14px 16px; background-color:#f8f8f8;
+                                               font-weight:bold;">
+                                        Status
+                                    </td>
+
+                                    <td style="padding:14px 16px;">
+                                        <span style="display:inline-block; background-color:#fff3cd;
+                                                     color:#856404; padding:6px 12px; border-radius:20px;
+                                                     font-size:13px; font-weight:bold;">
+                                            @Model.Status
+                                        </span>
+                                    </td>
+                                </tr>
+
+                            </table>
+
+                            <!-- Customer Message -->
+                            <div style="margin-top:28px;">
+
+                                <h3 style="margin:0 0 10px; color:#222222; font-size:18px;">
+                                    Customer Message
+                                </h3>
+
+                                <div style="background-color:#f8f8f8; border-left:4px solid #111111;
+                                            padding:16px; color:#555555; line-height:1.6;
+                                            white-space:pre-wrap; overflow-wrap:anywhere;">
+                                    @Model.MessageText
+                                </div>
+
+                            </div>
+
+                            <p style="margin:28px 0 0; color:#666666; font-size:14px; line-height:1.6;">
+                                Log in to the KXN Photo Studio admin dashboard to review and manage this booking.
+                            </p>
+
+                        </td>
+                    </tr>
+
+                    <!-- Footer -->
+                    <tr>
+                        <td style="background-color:#111111; padding:22px; text-align:center;">
+
+                            <p style="margin:0; color:#bdbdbd; font-size:13px;">
+                                KXN Photo Studio Booking Notification
+                            </p>
+
+                        </td>
+                    </tr>
+
+                </table>
+
+            </td>
+        </tr>
+
+    </table>
+
+</body>
+</html>

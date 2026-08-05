@@ -36,12 +36,15 @@ namespace KxnPhotoStudio
                 options.LogoutPath = "/Admin/Auth/Logout";
             });
 
-            builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+            builder.Services.Configure<EmailSettings>(
+                builder.Configuration.GetSection("EmailSettings"));
 
             builder.Services.AddScoped<IEmailService, EmailService>();
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IClientService, ClientService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IBookingEmailService, BookingEmailService>();
+            builder.Services.AddScoped<IRazorViewRenderService, RazorViewRenderService>();
 
             var app = builder.Build();
 

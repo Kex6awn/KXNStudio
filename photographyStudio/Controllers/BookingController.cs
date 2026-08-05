@@ -1,28 +1,25 @@
 ﻿using KxnPhotoStudio.Data;
 using KxnPhotoStudio.Models;
+using KxnPhotoStudio.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using KxnPhotoStudio.Services;
 
 namespace KxnPhotoStudio.Controllers
 {
     public class BookingController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly IEmailService _emailService;
-        private readonly IConfiguration _configuration;
         private readonly IBookingService _bookingService;
+        private readonly IBookingEmailService _bookingEmailService;
 
         public BookingController(
             AppDbContext context,
-            IEmailService emailService,
-            IConfiguration configuration,
-            IBookingService bookingService)
+            IBookingService bookingService,
+            IBookingEmailService bookingEmailService)
         {
             _context = context;
-            _emailService = emailService;
-            _configuration = configuration;
             _bookingService = bookingService;
+            _bookingEmailService = bookingEmailService;
         }
 
         [HttpGet]
@@ -40,34 +37,47 @@ namespace KxnPhotoStudio.Controllers
             var endDate = DateTime.Today.AddMonths(3);
 
             var bookings = await _context.Bookings
-                .Where(b => b.EventDate.Date >= startDate &&
-                            b.EventDate.Date <= endDate &&
-                            b.Status != "Cancelled")
+                .Where(b =>
+                    b.EventDate.Date >= startDate &&
+                    b.EventDate.Date <= endDate &&
+                    b.Status != "Cancelled" &&
+                    b.Status != "Declined")
                 .ToListAsync();
 
             var fullyBookedDates = new List<string>();
 
-            for (var date = startDate; date <= endDate; date = date.AddDays(1))
+            for (var date = startDate;
+                 date <= endDate;
+                 date = date.AddDays(1))
             {
                 var dayBookings = bookings
                     .Where(b => b.EventDate.Date == date.Date)
                     .ToList();
 
-                bool hasAvailableSlot = false;
+                var hasAvailableSlot = false;
 
-                for (var slot = businessStart; slot < businessEnd; slot = slot.Add(TimeSpan.FromHours(1)))
+                for (var slot = businessStart;
+                     slot < businessEnd;
+                     slot = slot.Add(TimeSpan.FromHours(1)))
                 {
-                    var requestedEnd = slot.Add(TimeSpan.FromHours(durationHours));
+                    var requestedEnd = slot.Add(
+                        TimeSpan.FromHours(durationHours));
 
                     if (requestedEnd > businessEnd)
+                    {
                         continue;
+                    }
 
-                    bool overlaps = dayBookings.Any(existing =>
+                    var overlaps = dayBookings.Any(existing =>
                     {
                         var existingStart = existing.StartTime;
-                        var existingEnd = existing.StartTime.Add(TimeSpan.FromHours(existing.DurationHours));
 
-                        return slot < existingEnd && requestedEnd > existingStart;
+                        var existingEnd = existing.StartTime.Add(
+                            TimeSpan.FromHours(
+                                existing.DurationHours));
+
+                        return slot < existingEnd &&
+                               requestedEnd > existingStart;
                     });
 
                     if (!overlaps)
@@ -79,7 +89,8 @@ namespace KxnPhotoStudio.Controllers
 
                 if (!hasAvailableSlot)
                 {
-                    fullyBookedDates.Add(date.ToString("yyyy-MM-dd"));
+                    fullyBookedDates.Add(
+                        date.ToString("yyyy-MM-dd"));
                 }
             }
 
@@ -87,10 +98,12 @@ namespace KxnPhotoStudio.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> GetAvailableTimeSlots(DateTime eventDate, int durationHours)
+        public async Task<IActionResult> GetAvailableTimeSlots(
+            DateTime eventDate,
+            int durationHours)
         {
-            var businessStart = new TimeSpan(9, 0, 0);   // 9:00 AM
-            var businessEnd = new TimeSpan(18, 0, 0);    // 6:00 PM
+            var businessStart = new TimeSpan(9, 0, 0);
+            var businessEnd = new TimeSpan(18, 0, 0);
 
             if (durationHours < 1)
             {
@@ -98,29 +111,42 @@ namespace KxnPhotoStudio.Controllers
             }
 
             var existingBookings = await _context.Bookings
-                .Where(b => b.EventDate.Date == eventDate.Date && b.Status != "Cancelled")
+                .Where(b =>
+                    b.EventDate.Date == eventDate.Date &&
+                    b.Status != "Cancelled" &&
+                    b.Status != "Declined")
                 .ToListAsync();
 
             var availableSlots = new List<string>();
 
-            for (var slot = businessStart; slot < businessEnd; slot = slot.Add(TimeSpan.FromHours(1)))
+            for (var slot = businessStart;
+                 slot < businessEnd;
+                 slot = slot.Add(TimeSpan.FromHours(1)))
             {
-                var requestedEnd = slot.Add(TimeSpan.FromHours(durationHours));
+                var requestedEnd = slot.Add(
+                    TimeSpan.FromHours(durationHours));
 
                 if (requestedEnd > businessEnd)
+                {
                     continue;
+                }
 
-                bool overlaps = existingBookings.Any(existing =>
+                var overlaps = existingBookings.Any(existing =>
                 {
                     var existingStart = existing.StartTime;
-                    var existingEnd = existing.StartTime.Add(TimeSpan.FromHours(existing.DurationHours));
 
-                    return slot < existingEnd && requestedEnd > existingStart;
+                    var existingEnd = existing.StartTime.Add(
+                        TimeSpan.FromHours(
+                            existing.DurationHours));
+
+                    return slot < existingEnd &&
+                           requestedEnd > existingStart;
                 });
 
                 if (!overlaps)
                 {
-                    availableSlots.Add(slot.ToString(@"hh\:mm"));
+                    availableSlots.Add(
+                        slot.ToString(@"hh\:mm"));
                 }
             }
 
@@ -142,380 +168,31 @@ namespace KxnPhotoStudio.Controllers
                 return View(booking);
             }
 
-            var result = await _bookingService.CreateBookingAsync(booking);
+            var result =
+                await _bookingService.CreateBookingAsync(booking);
 
             if (!result.Succeeded)
             {
                 ModelState.AddModelError(
                     result.ErrorField ?? string.Empty,
-                    result.ErrorMessage ?? "The booking could not be created.");
+                    result.ErrorMessage ??
+                    "The booking could not be created.");
 
                 return View(booking);
             }
 
-            var adminEmail = _configuration["EmailSettings:AdminEmail"];
-
-            var subject = "New Booking Request - KXN Photo Studio";
-
-            var formattedDate = booking.EventDate.ToString("MMMM dd, yyyy");
-            var formattedTime = DateTime.Today
-                .Add(booking.StartTime)
-                .ToString("h:mm tt");
-
-            var messageText = string.IsNullOrWhiteSpace(booking.Message)
-                ? "No additional message was provided."
-                : booking.Message;
-
-            var body = $@"
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset=""UTF-8"">
-                    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                    <title>New Booking Request</title>
-                </head>
-
-                <body style=""margin:0; padding:0; background-color:#f4f4f4; font-family:Arial, Helvetica, sans-serif;"">
-
-                    <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0""
-                           style=""background-color:#f4f4f4; padding:30px 15px;"">
-                        <tr>
-                            <td align=""center"">
-
-                                <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0""
-                                       style=""max-width:650px; background-color:#ffffff; border-radius:12px; overflow:hidden;
-                                              box-shadow:0 4px 18px rgba(0,0,0,0.08);"">
-
-                                    <!-- Header -->
-                                    <tr>
-                                        <td style=""background-color:#111111; padding:32px 25px; text-align:center;"">
-                                            <h1 style=""margin:0; color:#ffffff; font-size:28px; letter-spacing:1px;"">
-                                                KXN Photo Studio
-                                            </h1>
-
-                                            <p style=""margin:10px 0 0; color:#d6d6d6; font-size:15px;"">
-                                                New Booking Request
-                                            </p>
-                                        </td>
-                                    </tr>
-
-                                    <!-- Main Content -->
-                                    <tr>
-                                        <td style=""padding:35px 30px;"">
-
-                                            <h2 style=""margin:0 0 10px; color:#222222; font-size:23px;"">
-                                                You received a new booking
-                                            </h2>
-
-                                            <p style=""margin:0 0 28px; color:#666666; font-size:15px; line-height:1.6;"">
-                                                A customer submitted a booking request through the KXN Photo Studio website.
-                                            </p>
-
-                                            <!-- Booking Details -->
-                                            <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0""
-                                                   style=""border-collapse:collapse; border:1px solid #e6e6e6; border-radius:8px;"">
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold; width:35%;"">
-                                                        Customer
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {booking.FullName}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Email
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        <a href=""mailto:{booking.Email}""
-                                                           style=""color:#111111; text-decoration:none;"">
-                                                            {booking.Email}
-                                                        </a>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Phone
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        <a href=""tel:{booking.PhoneNumber}""
-                                                           style=""color:#111111; text-decoration:none;"">
-                                                            {booking.PhoneNumber}
-                                                        </a>
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Service
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {booking.ServiceType}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Date
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {formattedDate}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Time
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {formattedTime}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Duration
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {booking.DurationHours} hour(s)
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               font-weight:bold;"">
-                                                        Status
-                                                    </td>
-                                                    <td style=""padding:14px 16px;"">
-                                                        <span style=""display:inline-block; background-color:#fff3cd;
-                                                                     color:#856404; padding:6px 12px; border-radius:20px;
-                                                                     font-size:13px; font-weight:bold;"">
-                                                            {booking.Status}
-                                                        </span>
-                                                    </td>
-                                                </tr>
-
-                                            </table>
-
-                                            <!-- Customer Message -->
-                                            <div style=""margin-top:28px;"">
-                                                <h3 style=""margin:0 0 10px; color:#222222; font-size:18px;"">
-                                                    Customer Message
-                                                </h3>
-
-                                                <div style=""background-color:#f8f8f8; border-left:4px solid #111111;
-                                                            padding:16px; color:#555555; line-height:1.6;"">
-                                                    {messageText}
-                                                </div>
-                                            </div>
-
-                                            <p style=""margin:28px 0 0; color:#666666; font-size:14px; line-height:1.6;"">
-                                                Log in to the KXN Photo Studio admin dashboard to review and manage this booking.
-                                            </p>
-
-                                        </td>
-                                    </tr>
-
-                                    <!-- Footer -->
-                                    <tr>
-                                        <td style=""background-color:#111111; padding:22px; text-align:center;"">
-                                            <p style=""margin:0; color:#bdbdbd; font-size:13px;"">
-                                                KXN Photo Studio Booking Notification
-                                            </p>
-                                        </td>
-                                    </tr>
-
-                                </table>
-
-                            </td>
-                        </tr>
-                    </table>
-
-                </body>
-                </html>";
-
-
-            var customerSubject = "We Received Your Booking Request - KXN Photo Studio";
-
-            var customerBody = $@"
-                <!DOCTYPE html>
-                <html>
-                <head>
-                    <meta charset=""UTF-8"">
-                    <meta name=""viewport"" content=""width=device-width, initial-scale=1.0"">
-                    <title>Booking Confirmation</title>
-                </head>
-
-                <body style=""margin:0; padding:0; background-color:#f4f4f4; font-family:Arial, Helvetica, sans-serif;"">
-
-                    <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0""
-                           style=""background-color:#f4f4f4; padding:30px 15px;"">
-                        <tr>
-                            <td align=""center"">
-
-                                <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0""
-                                       style=""max-width:650px; background-color:#ffffff; border-radius:12px; overflow:hidden;
-                                              box-shadow:0 4px 18px rgba(0,0,0,0.08);"">
-
-                                    <tr>
-                                        <td style=""background-color:#111111; padding:32px 25px; text-align:center;"">
-                                            <h1 style=""margin:0; color:#ffffff; font-size:28px; letter-spacing:1px;"">
-                                                KXN Photo Studio
-                                            </h1>
-
-                                            <p style=""margin:10px 0 0; color:#d6d6d6; font-size:15px;"">
-                                                Booking Request Received
-                                            </p>
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style=""padding:35px 30px;"">
-
-                                            <h2 style=""margin:0 0 15px; color:#222222; font-size:23px;"">
-                                                Hi {booking.FullName},
-                                            </h2>
-
-                                            <p style=""margin:0 0 18px; color:#555555; font-size:15px; line-height:1.7;"">
-                                                Thank you for choosing KXN Photo Studio.
-                                            </p>
-
-                                            <p style=""margin:0 0 28px; color:#555555; font-size:15px; line-height:1.7;"">
-                                                We received your booking request successfully. Your request is currently pending review.
-                                                We will contact you once it has been approved or if we need any additional information.
-                                            </p>
-
-                                            <table role=""presentation"" width=""100%"" cellspacing=""0"" cellpadding=""0"" border=""0""
-                                                   style=""border-collapse:collapse; border:1px solid #e6e6e6;"">
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold; width:35%;"">
-                                                        Service
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {booking.ServiceType}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Date
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {formattedDate}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Time
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {formattedTime}
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               border-bottom:1px solid #e6e6e6; font-weight:bold;"">
-                                                        Duration
-                                                    </td>
-                                                    <td style=""padding:14px 16px; border-bottom:1px solid #e6e6e6;"">
-                                                        {booking.DurationHours} hour(s)
-                                                    </td>
-                                                </tr>
-
-                                                <tr>
-                                                    <td style=""padding:14px 16px; background-color:#f8f8f8;
-                                                               font-weight:bold;"">
-                                                        Status
-                                                    </td>
-                                                    <td style=""padding:14px 16px;"">
-                                                        <span style=""display:inline-block; background-color:#fff3cd;
-                                                                     color:#856404; padding:6px 12px; border-radius:20px;
-                                                                     font-size:13px; font-weight:bold;"">
-                                                            Pending Review
-                                                        </span>
-                                                    </td>
-                                                </tr>
-
-                                            </table>
-
-                                            <div style=""margin-top:28px; background-color:#f8f8f8;
-                                                        border-left:4px solid #111111; padding:18px;"">
-
-                                                <p style=""margin:0; color:#555555; font-size:14px; line-height:1.7;"">
-                                                    Please remember that this email confirms that we received your request.
-                                                    Your session is not officially confirmed until you receive an approval email from us.
-                                                </p>
-
-                                            </div>
-
-                                            <p style=""margin:28px 0 0; color:#555555; font-size:15px; line-height:1.7;"">
-                                                Thank you for trusting KXN Photo Studio with your memories.
-                                            </p>
-
-                                            <p style=""margin:22px 0 0; color:#222222; font-size:15px; line-height:1.7;"">
-                                                Sincerely,<br>
-                                                <strong>KXN Photo Studio</strong>
-                                            </p>
-
-                                        </td>
-                                    </tr>
-
-                                    <tr>
-                                        <td style=""background-color:#111111; padding:22px; text-align:center;"">
-                                            <p style=""margin:0; color:#bdbdbd; font-size:13px;"">
-                                                KXN Photo Studio
-                                            </p>
-                                        </td>
-                                    </tr>
-
-                                </table>
-
-                            </td>
-                        </tr>
-                    </table>
-
-                </body>
-                </html>";
-
             try
             {
-                if (!string.IsNullOrWhiteSpace(adminEmail))
-                {
-                    await _emailService.SendEmailAsync(
-                        adminEmail,
-                        subject,
-                        body
-                    );
-                }
-
-                if (!string.IsNullOrWhiteSpace(booking.Email))
-                {
-                    await _emailService.SendEmailAsync(
-                        booking.Email,
-                        customerSubject,
-                        customerBody
-                    );
-                }
+                await _bookingEmailService
+                    .SendNewBookingEmailsAsync(booking);
             }
             catch (Exception ex)
             {
-                throw new Exception("Email failed: " + ex.Message, ex);
+                Console.WriteLine(
+                    $"Booking email failed: {ex.Message}");
+
+                TempData["WarningMessage"] =
+                    "Your booking was saved, but the confirmation email could not be sent.";
             }
 
             return RedirectToAction(nameof(ThankYou));
