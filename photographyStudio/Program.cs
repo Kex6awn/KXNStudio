@@ -88,8 +88,15 @@ namespace KxnPhotoStudio
                 var services = scope.ServiceProvider;
                 var userManager = services.GetRequiredService<UserManager<IdentityUser>>();
 
-                string adminEmail = "admin@kxn.com";
-                string adminPassword = "Admin123!";
+                var adminEmail = builder.Configuration["AdminSettings:Email"];
+                var adminPassword = builder.Configuration["AdminSettings:Password"];
+
+                if (string.IsNullOrWhiteSpace(adminEmail) ||
+                    string.IsNullOrWhiteSpace(adminPassword))
+                {
+                    throw new InvalidOperationException(
+                        "Admin credentials are missing from User Secrets.");
+                }
 
                 var existingUser = await userManager.FindByEmailAsync(adminEmail);
 
