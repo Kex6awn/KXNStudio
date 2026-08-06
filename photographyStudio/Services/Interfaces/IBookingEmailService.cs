@@ -1,6 +1,6 @@
 ﻿using KxnPhotoStudio.Models;
 
-namespace KxnPhotoStudio.Services
+namespace KxnPhotoStudio.Services.Interfaces
 {
     public interface IBookingEmailService
     {

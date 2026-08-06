@@ -1,4 +1,4 @@
-﻿using KxnPhotoStudio.Services;
+﻿using KxnPhotoStudio.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

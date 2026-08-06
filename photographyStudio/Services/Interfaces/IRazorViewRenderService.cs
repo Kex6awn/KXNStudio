@@ -1,4 +1,4 @@
-﻿namespace KxnPhotoStudio.Services
+﻿namespace KxnPhotoStudio.Services.Interfaces
 {
     public interface IRazorViewRenderService
     {

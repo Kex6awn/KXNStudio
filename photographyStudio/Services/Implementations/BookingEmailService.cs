@@ -1,7 +1,8 @@
 ﻿using KxnPhotoStudio.Models;
 using KxnPhotoStudio.Models.ViewModels;
+using KxnPhotoStudio.Services.Interfaces;
 
-namespace KxnPhotoStudio.Services
+namespace KxnPhotoStudio.Services.Implementations
 {
     public class BookingEmailService : IBookingEmailService
     {

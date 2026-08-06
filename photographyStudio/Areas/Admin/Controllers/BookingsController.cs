@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KxnPhotoStudio.Models.ViewModels;
-using KxnPhotoStudio.Services;
+using KxnPhotoStudio.Services.Interfaces;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
 {

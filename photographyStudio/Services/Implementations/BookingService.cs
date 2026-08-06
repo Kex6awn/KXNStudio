@@ -1,9 +1,10 @@
 ﻿using KxnPhotoStudio.Data;
 using KxnPhotoStudio.Models;
 using KxnPhotoStudio.Models.ViewModels;
+using KxnPhotoStudio.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
-namespace KxnPhotoStudio.Services
+namespace KxnPhotoStudio.Services.Implementations
 {
     public class BookingService : IBookingService
     {

@@ -1,6 +1,6 @@
 ﻿using KxnPhotoStudio.Models.ViewModels;
 
-namespace KxnPhotoStudio.Services
+namespace KxnPhotoStudio.Services.Interfaces
 {
     public interface IDashboardService
     {

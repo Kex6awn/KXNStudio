@@ -1,6 +1,6 @@
 ﻿using KxnPhotoStudio.Data;
 using KxnPhotoStudio.Models;
-using KxnPhotoStudio.Services;
+using KxnPhotoStudio.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

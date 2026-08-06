@@ -1,9 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using KxnPhotoStudio.Services;
 using KxnPhotoStudio.Models;
 using KxnPhotoStudio.Data;
 using Microsoft.AspNetCore.Identity;
-//using System.Threading.Tasks;
+using KxnPhotoStudio.Services.Implementations;
+using KxnPhotoStudio.Services.Interfaces;
 
 namespace KxnPhotoStudio
 {

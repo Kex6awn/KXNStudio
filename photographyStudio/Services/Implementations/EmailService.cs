@@ -1,10 +1,11 @@
 ﻿using KxnPhotoStudio.Models;
+using KxnPhotoStudio.Services.Interfaces;
 using MailKit.Net.Smtp;
 using MailKit.Security;
 using Microsoft.Extensions.Options;
 using MimeKit;
 
-namespace KxnPhotoStudio.Services
+namespace KxnPhotoStudio.Services.Implementations
 {
     public class EmailService : IEmailService
     {

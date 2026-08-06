@@ -7,8 +7,9 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Routing;
 using System.IO;
+using KxnPhotoStudio.Services.Interfaces;
 
-namespace KxnPhotoStudio.Services
+namespace KxnPhotoStudio.Services.Implementations
 {
     public class RazorViewRenderService : IRazorViewRenderService
     {
