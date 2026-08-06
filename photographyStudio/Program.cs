@@ -43,6 +43,7 @@ namespace KxnPhotoStudio
             builder.Services.AddScoped<IDashboardService, DashboardService>();
             builder.Services.AddScoped<IClientService, ClientService>();
             builder.Services.AddScoped<IBookingService, BookingService>();
+            builder.Services.AddScoped<IInvoiceService, InvoiceService>();
             builder.Services.AddScoped<IBookingEmailService, BookingEmailService>();
             builder.Services.AddScoped<IRazorViewRenderService, RazorViewRenderService>();
 
