@@ -25,6 +25,7 @@ namespace KxnPhotoStudio.Data
             base.OnModelCreating(modelBuilder);
 
             modelBuilder.Entity<Client>().HasIndex(c => c.Email).IsUnique();
+            modelBuilder.Entity<Invoice>().HasIndex(i => i.InvoiceNumber).IsUnique();
 
             modelBuilder.Entity<Client>()
                 .HasMany(c => c.Bookings)
