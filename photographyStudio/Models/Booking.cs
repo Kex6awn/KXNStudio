@@ -10,6 +10,8 @@ namespace KxnPhotoStudio.Models
         public int? ClientId { get; set; }
         public Client? Client { get; set; }
 
+        public Invoice? Invoice { get; set; }
+
         [Required]
         [StringLength(100)]
         public string FullName { get; set; } = string.Empty;

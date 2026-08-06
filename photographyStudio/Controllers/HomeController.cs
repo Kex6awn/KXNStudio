@@ -23,9 +23,5 @@ namespace KxnPhotoStudio.Controllers
 
             return View(featuredPhotos);
         }
-        //public IActionResult Index()
-        //{
-        //    return View();
-        //}
     }
 }

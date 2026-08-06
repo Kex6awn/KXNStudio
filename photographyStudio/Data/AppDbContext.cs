@@ -18,6 +18,8 @@ namespace KxnPhotoStudio.Data
 
         public DbSet<ClientNote> ClientNotes => Set<ClientNote>();
 
+        public DbSet<Invoice> Invoices => Set<Invoice>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -35,6 +37,12 @@ namespace KxnPhotoStudio.Data
                 .WithOne(note => note.Client)
                 .HasForeignKey(note => note.ClientId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Booking>()
+                .HasOne(booking => booking.Invoice)
+                .WithOne(invoice => invoice.Booking)
+                .HasForeignKey<Invoice>(invoice => invoice.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
 
             // seed starter categories
 

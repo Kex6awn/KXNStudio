@@ -38,12 +38,6 @@ namespace KxnPhotoStudio.Controllers
 
             return View(photos);
         }
-        //public async Task<IActionResult> Index ()
-        //{
-        //    var photos = await _context.Photos.Include(p => p.Category).OrderByDescending(p => p.CreatedDate).ToListAsync();
-
-        //    return View(photos);
-        //}
 
         // GET: Upload
         public async Task<IActionResult> Upload()
