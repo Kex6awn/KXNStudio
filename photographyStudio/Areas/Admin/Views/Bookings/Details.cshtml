@@ -16,5 +16,23 @@
 <div class="mb-3"><strong>Message: </strong>@Model.Message</div>
 <div class="mb-3"><strong>Status: </strong>@Model.Status</div>
 
-<a asp-action="Index" class="btn btn-secondary">Back</a>
+@if (string.Equals(Model.Status, "Confirmed", StringComparison.OrdinalIgnoreCase)
+   && Model.Invoice == null)
+{
+    <a asp-area="Admin"
+       asp-controller="Invoices"
+       asp-action="Create"
+       asp-route-bookingId="@Model.BookingId"
+       class="btn btn-success">
+        <i class="bi bi-receipt me-1"></i>
+        Create Invoice
+    </a>
+}
+
+<a asp-area="Admin"
+   asp-controller="Bookings"
+   asp-action="Index"
+   class="btn btn-secondary">
+    Back
+</a>
 

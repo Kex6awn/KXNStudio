@@ -37,6 +37,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             if (id == null) return NotFound();
 
             var booking = await _context.Bookings
+                .Include(b => b.Invoice)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null) return NotFound();
