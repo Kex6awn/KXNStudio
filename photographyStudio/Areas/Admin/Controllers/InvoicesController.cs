@@ -137,7 +137,8 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         {
             var invoice = await _context.Invoices
                 .Include(i => i.Booking)
-                .ThenInclude(b => b.Client)
+                    .ThenInclude(b => b.Client)
+                .Include(i => i.Payments)
                 .FirstOrDefaultAsync(i => i.InvoiceId == id);
 
             if (invoice == null)

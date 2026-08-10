@@ -17,6 +17,21 @@
             </p>
         </div>
 
+        @if (Model.BalanceRemaining > 0 &&
+        !string.Equals(
+        Model.Status,
+        "Cancelled",
+        StringComparison.OrdinalIgnoreCase))
+        {
+            <a asp-area="Admin"
+               asp-controller="Invoices"
+               asp-action="RecordPayment"
+               asp-route-id="@Model.InvoiceId"
+               class="btn btn-success">
+                <i class="bi bi-cash-coin me-1"></i>
+                Record Payment
+            </a>
+        }
         <a asp-area="Admin"
            asp-controller="Bookings"
            asp-action="Details"
@@ -196,6 +211,108 @@
             </div>
 
         </div>
+
+    </div>
+
+</div>
+
+<div class="card shadow-sm border-0 mt-4">
+
+    <div class="card-header bg-white py-3">
+        <h4 class="fw-bold mb-1">
+            Payment History
+        </h4>
+
+        <p class="text-muted mb-0">
+            Payments recorded for this invoice.
+        </p>
+    </div>
+
+    <div class="card-body p-0">
+
+        @if (Model.Payments.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle mb-0">
+
+                    <thead class="table-light">
+                        <tr>
+                            <th class="ps-4">Date</th>
+                            <th>Amount</th>
+                            <th>Method</th>
+                            <th>Reference</th>
+                            <th>Notes</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var payment in Model.Payments
+                       .OrderByDescending(p => p.PaymentDate)
+                       .ThenByDescending(p => p.CreatedAt))
+                        {
+                            <tr>
+
+                                <td class="ps-4">
+                                    @payment.PaymentDate.ToString("MMM dd, yyyy")
+                                </td>
+
+                                <td class="fw-semibold text-success">
+                                    @payment.Amount.ToString("C")
+                                </td>
+
+                                <td>
+                                    @payment.Method
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(payment.ReferenceNumber))
+                                    {
+                                        @payment.ReferenceNumber
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+
+                                <td>
+                                    @if (!string.IsNullOrWhiteSpace(payment.Notes))
+                                    {
+                                        @payment.Notes
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">—</span>
+                                    }
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="text-center py-5">
+
+                <i class="bi bi-cash-stack fs-1 text-muted"></i>
+
+                <h5 class="mt-3 text-muted">
+                    No payments recorded
+                </h5>
+
+                <p class="text-muted mb-0">
+                    Payments will appear here after they are recorded.
+                </p>
+
+            </div>
+        }
 
     </div>
 
