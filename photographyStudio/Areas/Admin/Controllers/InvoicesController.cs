@@ -23,6 +23,18 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         }
 
         [HttpGet]
+        public async Task<IActionResult> Index()
+        {
+            var invoices = await _context.Invoices
+                .Include(i => i.Booking)
+                .ThenInclude(b => b.Client)
+                .OrderByDescending(i => i.CreatedAt)
+                .ToListAsync();
+
+            return View(invoices);
+        }
+
+        [HttpGet]
         public async Task<IActionResult> Create(int bookingId)
         {
             var booking = await _context.Bookings

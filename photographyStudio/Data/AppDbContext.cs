@@ -20,6 +20,8 @@ namespace KxnPhotoStudio.Data
 
         public DbSet<Invoice> Invoices => Set<Invoice>();
 
+        public DbSet<Payment> Payments => Set<Payment>();
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -43,6 +45,12 @@ namespace KxnPhotoStudio.Data
                 .HasOne(booking => booking.Invoice)
                 .WithOne(invoice => invoice.Booking)
                 .HasForeignKey<Invoice>(invoice => invoice.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Invoice>()
+                .HasMany(invoice => invoice.Payments)
+                .WithOne(payment => payment.Invoice)
+                .HasForeignKey(payment => payment.InvoiceId)
                 .OnDelete(DeleteBehavior.Restrict);
 
             // seed starter categories

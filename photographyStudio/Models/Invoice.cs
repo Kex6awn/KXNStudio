@@ -53,7 +53,8 @@ namespace KxnPhotoStudio.Models
             Math.Max(0, Subtotal + Tax - Discount);
 
         [NotMapped]
-        public decimal BalanceRemaining =>
-            Math.Max(0, Total - AmountPaid);
+        public decimal BalanceRemaining => Math.Max(0, Total - AmountPaid);
+
+        public ICollection<Payment> Payments { get; set; } = new List<Payment>();
     }
 }
