@@ -1,0 +1,275 @@
+﻿/* =========================================================
+   KXN PHOTO STUDIO - ADMIN DESIGN SYSTEM
+   ========================================================= */
+
+
+/* ---------- Page Layout ---------- */
+
+.kxn-page {
+    padding: 1.5rem 0;
+}
+
+.kxn-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.kxn-page-title {
+    margin: 0;
+    font-size: 2rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+.kxn-page-description {
+    margin: 0.35rem 0 0;
+    color: #6c757d;
+}
+
+
+/* ---------- Cards ---------- */
+
+.kxn-card {
+    background-color: #ffffff;
+    border: 0;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+}
+
+.kxn-card-header {
+    padding: 1.25rem 1.5rem;
+    background-color: #ffffff;
+    border-bottom: 1px solid #eeeeee;
+}
+
+.kxn-card-body {
+    padding: 1.5rem;
+}
+
+.kxn-card-title {
+    margin: 0;
+    font-size: 1.15rem;
+    font-weight: 700;
+}
+
+.kxn-card-description {
+    margin: 0.25rem 0 0;
+    color: #6c757d;
+    font-size: 0.9rem;
+}
+
+
+/* ---------- Stat Cards ---------- */
+
+.kxn-stat-card {
+    background-color: #ffffff;
+    border: 0;
+    border-radius: 16px;
+    padding: 1.25rem;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+    height: 100%;
+}
+
+.kxn-stat-label {
+    margin-bottom: 0.5rem;
+    color: #6c757d;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.kxn-stat-value {
+    margin: 0;
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: #212529;
+}
+
+
+/* ---------- Tables ---------- */
+
+.kxn-table-wrapper {
+    overflow: hidden;
+    background-color: #ffffff;
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.kxn-table {
+    margin-bottom: 0;
+}
+
+    .kxn-table thead th {
+        padding: 1rem 1.25rem;
+        border-bottom: 1px solid #e9ecef;
+        background-color: #f8f9fa;
+        color: #495057;
+        font-size: 0.85rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .kxn-table tbody td {
+        padding: 1rem 1.25rem;
+        vertical-align: middle;
+    }
+
+    .kxn-table tbody tr {
+        transition: background-color 0.15s ease;
+    }
+
+        .kxn-table tbody tr:hover {
+            background-color: #fafafa;
+        }
+
+
+/* ---------- Status Badges ---------- */
+
+.kxn-status {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.4rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.kxn-status-pending {
+    background-color: #e7f1ff;
+    color: #084298;
+}
+
+.kxn-status-confirmed,
+.kxn-status-paid {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
+.kxn-status-partial {
+    background-color: #fff3cd;
+    color: #664d03;
+}
+
+.kxn-status-declined,
+.kxn-status-overdue {
+    background-color: #f8d7da;
+    color: #842029;
+}
+
+.kxn-status-cancelled {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+.kxn-status-draft {
+    background-color: #e2e3e5;
+    color: #41464b;
+}
+
+
+/* ---------- Buttons ---------- */
+
+.kxn-btn-primary {
+    border: 1px solid #212529;
+    background-color: #212529;
+    color: #ffffff;
+}
+
+    .kxn-btn-primary:hover {
+        border-color: #000000;
+        background-color: #000000;
+        color: #ffffff;
+    }
+
+.kxn-btn-outline {
+    border: 1px solid #ced4da;
+    background-color: #ffffff;
+    color: #212529;
+}
+
+    .kxn-btn-outline:hover {
+        background-color: #f8f9fa;
+        color: #212529;
+    }
+
+
+/* ---------- Empty States ---------- */
+
+.kxn-empty-state {
+    padding: 4rem 1.5rem;
+    text-align: center;
+}
+
+.kxn-empty-icon {
+    margin-bottom: 1rem;
+    color: #adb5bd;
+    font-size: 3rem;
+}
+
+.kxn-empty-title {
+    margin-bottom: 0.5rem;
+    font-weight: 700;
+}
+
+.kxn-empty-description {
+    margin: 0;
+    color: #6c757d;
+}
+
+
+/* ---------- Forms ---------- */
+
+.kxn-form-label {
+    margin-bottom: 0.4rem;
+    font-weight: 600;
+}
+
+.kxn-form-section {
+    margin-bottom: 2rem;
+}
+
+.kxn-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.75rem;
+    padding-top: 1rem;
+}
+
+
+/* ---------- Responsive ---------- */
+
+@media (max-width: 767.98px) {
+    .kxn-page-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+        .kxn-page-header .btn {
+            width: 100%;
+        }
+
+    .kxn-page-title {
+        font-size: 1.65rem;
+    }
+
+    .kxn-card-body {
+        padding: 1.15rem;
+    }
+
+    .kxn-table tbody td,
+    .kxn-table thead th {
+        padding: 0.85rem 1rem;
+    }
+
+    .kxn-form-actions {
+        flex-direction: column-reverse;
+    }
+
+        .kxn-form-actions .btn {
+            width: 100%;
+        }
+}
