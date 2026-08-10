@@ -6,21 +6,27 @@
 
 <div class="container-fluid py-4">
 
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">
-                Invoice @Model.InvoiceNumber
-            </h1>
+    <div class="d-flex gap-2">
 
-            <p class="text-muted mb-0">
-                Invoice details for @Model.Booking.FullName.
-            </p>
-        </div>
+        <a asp-area="Admin"
+           asp-controller="Invoices"
+           asp-action="Index"
+           class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Invoices
+        </a>
+
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Details"
+           asp-route-id="@Model.BookingId"
+           class="btn btn-outline-info">
+            <i class="bi bi-calendar-event me-1"></i>
+            View Booking
+        </a>
 
         @if (Model.BalanceRemaining > 0 &&
-        !string.Equals(
-        Model.Status,
-        "Cancelled",
+        !string.Equals(Model.Status, "Cancelled",
         StringComparison.OrdinalIgnoreCase))
         {
             <a asp-area="Admin"
@@ -32,13 +38,7 @@
                 Record Payment
             </a>
         }
-        <a asp-area="Admin"
-           asp-controller="Bookings"
-           asp-action="Details"
-           asp-route-id="@Model.BookingId"
-           class="btn btn-secondary">
-            Back to Booking
-        </a>
+
     </div>
 
     @if (TempData["SuccessMessage"] != null)
@@ -151,7 +151,7 @@
                 <div class="card-body p-4">
 
                     <h4 class="fw-bold mb-4">
-                        Invoice Summary
+                        Financial Summary
                     </h4>
 
                     <div class="d-flex justify-content-between mb-3">
