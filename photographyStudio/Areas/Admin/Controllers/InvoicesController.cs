@@ -13,13 +13,16 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IInvoiceService _invoiceService;
+        private readonly IPaymentService _paymentService;
 
         public InvoicesController(
             AppDbContext context,
-            IInvoiceService invoiceService)
+            IInvoiceService invoiceService,
+            IPaymentService paymentService)
         {
             _context = context;
             _invoiceService = invoiceService;
+            _paymentService = paymentService;
         }
 
         [HttpGet]
@@ -143,6 +146,71 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             }
 
             return View(invoice);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> RecordPayment(int id)
+        {
+            var invoice = await _context.Invoices
+                .Include(i => i.Booking)
+                .Include(i => i.Payments)
+                .FirstOrDefaultAsync(i => i.InvoiceId == id);
+
+            if (invoice == null)
+            {
+                return NotFound();
+            }
+
+            var model = new RecordPaymentViewModel
+            {
+                InvoiceId = invoice.InvoiceId,
+                InvoiceNumber = invoice.InvoiceNumber,
+                ClientName = invoice.Booking.FullName,
+                Total = invoice.Total,
+                AmountPaid = invoice.AmountPaid,
+                BalanceRemaining = invoice.BalanceRemaining,
+                PaymentDate = DateTime.Today,
+                Method = "Cash"
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RecordPayment(
+            RecordPaymentViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                await _paymentService.RecordPaymentAsync(
+                    model.InvoiceId,
+                    model.Amount,
+                    model.PaymentDate,
+                    model.Method,
+                    model.ReferenceNumber,
+                    model.Notes);
+
+                TempData["SuccessMessage"] =
+                    "Payment recorded successfully.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id = model.InvoiceId });
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                return View(model);
+            }
         }
     }
 }
