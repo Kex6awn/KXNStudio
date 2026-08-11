@@ -36,51 +36,53 @@
     <div class="row g-4 mb-4">
 
         <div class="col-md-6 col-xl-3">
-            <div class="kxn-stat-card">
-                <p class="kxn-stat-label">
-                    Outstanding Revenue
-                </p>
 
-                <h2 class="kxn-stat-value">
-                    @totalOutstanding.ToString("C")
-                </h2>
-            </div>
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+                 {
+                     Label = "Outstanding Revenue",
+                     Value = totalOutstanding.ToString("C"),
+                     IconClass = "bi bi-cash-stack"
+                 }' />
+
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="kxn-stat-card">
-                <p class="kxn-stat-label">
-                    Paid This Month
-                </p>
 
-                <h2 class="kxn-stat-value text-success">
-                    @paidThisMonth.ToString("C")
-                </h2>
-            </div>
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+                 {
+                     Label = "Paid This Month",
+                     Value = paidThisMonth.ToString("C"),
+                     ValueClass = "text-success",
+                     IconClass = "bi bi-check-circle"
+                 }' />
+
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="kxn-stat-card">
-                <p class="kxn-stat-label">
-                    Pending Invoices
-                </p>
 
-                <h2 class="kxn-stat-value">
-                    @pendingCount
-                </h2>
-            </div>
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+                 {
+                     Label = "Pending Invoices",
+                     Value = pendingCount.ToString(),
+                     IconClass = "bi bi-hourglass-split"
+                 }' />
+
         </div>
 
         <div class="col-md-6 col-xl-3">
-            <div class="kxn-stat-card">
-                <p class="kxn-stat-label">
-                    Overdue
-                </p>
 
-                <h2 class="kxn-stat-value text-danger">
-                    @overdueCount
-                </h2>
-            </div>
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+                 {
+                     Label = "Overdue",
+                     Value = overdueCount.ToString(),
+                     ValueClass = "text-danger",
+                     IconClass = "bi bi-exclamation-triangle"
+                 }' />
+
         </div>
 
     </div>
@@ -134,21 +136,12 @@
                             var isOverdue =
                             invoice.BalanceRemaining > 0 &&
                             invoice.DueDate.Date < DateTime.Today &&
-                            invoice.Status != "Cancelled";
+                            !string.Equals(
+                            invoice.Status,
+                            "Cancelled",
+                            StringComparison.OrdinalIgnoreCase);
 
-                            var statusClass = isOverdue
-                            ? "kxn-status-overdue"
-                            : invoice.Status switch
-                            {
-                                "Paid" => "kxn-status-paid",
-                                "Partially Paid" => "kxn-status-partial",
-                                "Cancelled" => "kxn-status-cancelled",
-                                "Draft" => "kxn-status-draft",
-                                _ => "kxn-status-pending"
-                            };
-
-                            var statusText =
-                            isOverdue
+                            var displayStatus = isOverdue
                             ? "Overdue"
                             : invoice.Status;
 
@@ -189,9 +182,8 @@
                                 </td>
 
                                 <td>
-                                    <span class="kxn-status @statusClass">
-                                        @statusText
-                                    </span>
+                                    <partial name="_StatusBadge"
+                                             model="displayStatus" />
                                 </td>
 
                                 <td class="text-end">

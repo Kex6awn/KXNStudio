@@ -1,38 +1,300 @@
 ﻿@model KxnPhotoStudio.Models.Booking
+@using KxnPhotoStudio.Models.ViewModels
 
 @{
     ViewData["Title"] = "Booking Details";
+
+    var formattedTime = DateTime.Today
+        .Add(Model.StartTime)
+        .ToString("h:mm tt");
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = "Booking Details",
+                Description = $"Review the booking for {Model.FullName}."
+            };
 }
 
-<h2>Booking Details</h2>
+<div class="container-fluid kxn-page">
 
-<div class="mb-3"><strong>Name: </strong>@Model.FullName</div>
-<div class="mb-3"><strong>Email: </strong>@Model.Email</div>
-<div class="mb-3"><strong>Phone: </strong>@Model.PhoneNumber</div>
-<div class="mb-3"><strong>Service: </strong>@Model.ServiceType</div>
-<div class="mb-3"><strong>Date: </strong>@Model.EventDate.ToShortDateString()</div>
-<div class="mb-3"><strong>Start Time: </strong>@Model.StartTime.ToString(@"hh\:mm")</div>
-<div class="mb-3"><strong>Duration: </strong>@Model.DurationHours hour(s)</div>
-<div class="mb-3"><strong>Message: </strong>@Model.Message</div>
-<div class="mb-3"><strong>Status: </strong>@Model.Status</div>
+    <partial name="_PageHeader"
+             model="pageHeader" />
 
-@if (string.Equals(Model.Status, "Confirmed", StringComparison.OrdinalIgnoreCase)
-   && Model.Invoice == null)
-{
-    <a asp-area="Admin"
-       asp-controller="Invoices"
-       asp-action="Create"
-       asp-route-bookingId="@Model.BookingId"
-       class="btn btn-success">
-        <i class="bi bi-receipt me-1"></i>
-        Create Invoice
-    </a>
-}
+    <div class="d-flex flex-wrap justify-content-end gap-2 mb-4">
 
-<a asp-area="Admin"
-   asp-controller="Bookings"
-   asp-action="Index"
-   class="btn btn-secondary">
-    Back
-</a>
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Index"
+           class="btn kxn-btn-outline">
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Bookings
+        </a>
 
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Edit"
+           asp-route-id="@Model.BookingId"
+           class="btn btn-primary">
+            <i class="bi bi-pencil me-1"></i>
+            Edit Booking
+        </a>
+
+        @if (string.Equals(
+               Model.Status,
+               "Confirmed",
+               StringComparison.OrdinalIgnoreCase)
+           && Model.Invoice == null)
+        {
+                <a asp-area="Admin"
+                   asp-controller="Invoices"
+                   asp-action="Create"
+                   asp-route-bookingId="@Model.BookingId"
+                   class="btn btn-success">
+                    <i class="bi bi-receipt me-1"></i>
+                    Create Invoice
+                </a>
+        }
+
+        @if (Model.Invoice != null)
+        {
+                <a asp-area="Admin"
+                   asp-controller="Invoices"
+                   asp-action="Details"
+                   asp-route-id="@Model.Invoice.InvoiceId"
+                   class="btn btn-success">
+                    <i class="bi bi-receipt me-1"></i>
+                    View Invoice
+                </a>
+        }
+
+    </div>
+
+    <div class="row g-4">
+
+        <div class="col-lg-8">
+
+            <div class="kxn-card">
+
+                <div class="kxn-card-header">
+
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+
+                        <div>
+                            <h3 class="kxn-card-title">
+                                Session Information
+                            </h3>
+
+                            <p class="kxn-card-description">
+                                Booking and photography session details.
+                            </p>
+                        </div>
+
+                        <partial name="_StatusBadge"
+                                 model="Model.Status" />
+
+                    </div>
+
+                </div>
+
+                <div class="kxn-card-body">
+
+                    <div class="row g-4">
+
+                        <div class="col-md-6">
+
+                            <p class="text-muted mb-1">
+                                Client
+                            </p>
+
+                            <p class="fw-semibold mb-4">
+                                @Model.FullName
+                            </p>
+
+                            <p class="text-muted mb-1">
+                                Email
+                            </p>
+
+                            <p class="mb-4">
+                                <a href="mailto:@Model.Email"
+                                   class="text-decoration-none">
+                                    @Model.Email
+                                </a>
+                            </p>
+
+                            <p class="text-muted mb-1">
+                                Phone
+                            </p>
+
+                            <p class="mb-0">
+                                @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+                                {
+                                        <a href="tel:@Model.PhoneNumber"
+                                           class="text-decoration-none">
+                                        @Model.PhoneNumber
+                                        </a>
+                                }
+                                else
+                                {
+                                        <span class="text-muted">
+                                            Not provided
+                                        </span>
+                                }
+                            </p>
+
+                        </div>
+
+                        <div class="col-md-6">
+
+                            <p class="text-muted mb-1">
+                                Service
+                            </p>
+
+                            <p class="fw-semibold mb-4">
+                                @Model.ServiceType
+                            </p>
+
+                            <p class="text-muted mb-1">
+                                Session Date
+                            </p>
+
+                            <p class="mb-4">
+                                @Model.EventDate.ToString("MMMM dd, yyyy")
+                            </p>
+
+                            <p class="text-muted mb-1">
+                                Time
+                            </p>
+
+                            <p class="mb-4">
+                                @formattedTime
+                            </p>
+
+                            <p class="text-muted mb-1">
+                                Duration
+                            </p>
+
+                            <p class="mb-0">
+                                @Model.DurationHours hour(s)
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="kxn-card mt-4">
+
+                <div class="kxn-card-header">
+
+                    <h3 class="kxn-card-title">
+                        Client Message
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        Additional information submitted with the booking.
+                    </p>
+
+                </div>
+
+                <div class="kxn-card-body">
+
+                    @if (!string.IsNullOrWhiteSpace(Model.Message))
+                    {
+                            <p class="mb-0"
+                               style="white-space:pre-wrap;">
+                            @Model.Message
+                            </p>
+                    }
+                    else
+                    {
+                            <span class="text-muted">
+                                No additional message was provided.
+                            </span>
+                    }
+
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-lg-4">
+
+            <div class="kxn-card">
+
+                <div class="kxn-card-header">
+
+                    <h3 class="kxn-card-title">
+                        Booking Summary
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        Current booking status and related records.
+                    </p>
+
+                </div>
+
+                <div class="kxn-card-body">
+
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <span class="text-muted">
+                            Status
+                        </span>
+
+                        <partial name="_StatusBadge"
+                                 model="Model.Status" />
+
+                    </div>
+
+                    <hr />
+
+                    <div class="d-flex justify-content-between mb-3">
+
+                        <span class="text-muted">
+                            Invoice
+                        </span>
+
+                        @if (Model.Invoice != null)
+                        {
+                                <a asp-area="Admin"
+                                   asp-controller="Invoices"
+                                   asp-action="Details"
+                                   asp-route-id="@Model.Invoice.InvoiceId"
+                                   class="fw-semibold text-decoration-none">
+                                @Model.Invoice.InvoiceNumber
+                                </a>
+                        }
+                        else
+                        {
+                                <span class="text-muted">
+                                    Not created
+                                </span>
+                        }
+
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+
+                        <span class="text-muted">
+                            Created
+                        </span>
+
+                        <span>
+                            @(Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy"))
+                        </span>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>

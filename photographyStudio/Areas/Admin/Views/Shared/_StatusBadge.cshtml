@@ -1,0 +1,23 @@
+﻿@model string
+
+@{
+    var normalizedStatus = Model?
+        .Trim()
+        .ToLowerInvariant();
+
+    var statusClass = normalizedStatus switch
+    {
+        "confirmed" => "kxn-status-confirmed",
+        "paid" => "kxn-status-paid",
+        "partially paid" => "kxn-status-partial",
+        "declined" => "kxn-status-declined",
+        "overdue" => "kxn-status-overdue",
+        "cancelled" => "kxn-status-cancelled",
+        "draft" => "kxn-status-draft",
+        _ => "kxn-status-pending"
+    };
+}
+
+<span class="kxn-status @statusClass">
+    @Model
+</span>

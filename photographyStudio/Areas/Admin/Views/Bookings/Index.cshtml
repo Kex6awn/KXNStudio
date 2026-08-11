@@ -2,44 +2,292 @@
 
 @{
     ViewData["Title"] = "Bookings";
+
+    var totalBookings = Model.Count;
+
+    var pendingBookings = Model.Count(b =>
+        string.Equals(
+            b.Status,
+            "Pending",
+            StringComparison.OrdinalIgnoreCase));
+
+    var confirmedBookings = Model.Count(b =>
+        string.Equals(
+            b.Status,
+            "Confirmed",
+            StringComparison.OrdinalIgnoreCase));
+
+    var declinedBookings = Model.Count(b =>
+        string.Equals(
+            b.Status,
+            "Declined",
+            StringComparison.OrdinalIgnoreCase));
+
+    var cancelledBookings = Model.Count(b =>
+        string.Equals(
+            b.Status,
+            "Cancelled",
+            StringComparison.OrdinalIgnoreCase));
 }
 
-<h1 class="mb-4">Booking Requests</h1>
+<div class="container-fluid kxn-page">
 
-<table class="table table-bordered table-striped">
-    <thead class="table-dark">
-        <tr>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Service</th>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Hours</th>
-            <th>Status</th>
-            <th style="width: 220px;">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var b in Model)
-        {
-            <tr>
-                <td>@b.FullName</td>
-                <td>@b.Email</td>
-                <td>@b.ServiceType</td>
-                <td>@b.EventDate.ToShortDateString()</td>
-                <td>@b.StartTime.ToString(@"hh\:mm")</td>
-                <td>@b.DurationHours</td>
-                <td>
-                    <span class="badge @(b.Status == "Pending" ? "bg-warning" : b.Status == "Confirmed" ? "bg-success" : "bg-secondary")">
-                        @b.Status
-                    </span>
-                </td>
-                <td>
-                    <a asp-action="Details" asp-route-id="@b.BookingId" class="btn btn-sm btn-info">View</a>
-                    <a asp-action="Edit" asp-route-id="@b.BookingId" class="btn btn-sm btn-primary">Edit</a>
-                    <a asp-action="Delete" asp-route-id="@b.BookingId" class="btn btn-sm btn-danger">Delete</a>
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+    <div class="kxn-page-header">
+
+        <div>
+            <h1 class="kxn-page-title">
+                Bookings
+            </h1>
+
+            <p class="kxn-page-description">
+                Review booking requests, session details, and booking status.
+            </p>
+        </div>
+
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Calendar"
+           class="btn kxn-btn-outline">
+
+            <i class="bi bi-calendar3 me-1"></i>
+            Booking Calendar
+
+        </a>
+
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show">
+
+            @TempData["WarningMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    <!-- Summary Cards -->
+
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl">
+
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+             {
+                 Label = "Total Bookings",
+                 Value = totalBookings.ToString(),
+                 IconClass = "bi bi-calendar-check"
+             }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl">
+
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+             {
+                 Label = "Pending",
+                 Value = pendingBookings.ToString(),
+                 IconClass = "bi bi-hourglass-split"
+             }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl">
+
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+             {
+                 Label = "Confirmed",
+                 Value = confirmedBookings.ToString(),
+                 ValueClass = "text-success",
+                 IconClass = "bi bi-check-circle"
+             }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl">
+
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+             {
+                 Label = "Declined",
+                 Value = declinedBookings.ToString(),
+                 ValueClass = "text-danger",
+                 IconClass = "bi bi-x-circle"
+             }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl">
+
+            <partial name="_StatCard"
+                     model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+             {
+                 Label = "Cancelled",
+                 Value = cancelledBookings.ToString(),
+                 ValueClass = "text-secondary",
+                 IconClass = "bi bi-slash-circle"
+             }' />
+
+        </div>
+
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="kxn-card">
+
+            <div class="kxn-empty-state">
+
+                <div class="kxn-empty-icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+                <h4 class="kxn-empty-title">
+                    No bookings yet
+                </h4>
+
+                <p class="kxn-empty-description">
+                    New booking requests will appear here when clients submit them.
+                </p>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="kxn-table-wrapper">
+
+            <div class="table-responsive">
+
+                <table class="table kxn-table">
+
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Session Date</th>
+                            <th>Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var booking in Model)
+                        {
+                            var formattedTime = DateTime.Today
+                            .Add(booking.StartTime)
+                            .ToString("h:mm tt");
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @booking.FullName
+                                    </div>
+
+                                    <small class="text-muted">
+                                        @booking.Email
+                                    </small>
+
+                                </td>
+
+                                <td>
+                                    @booking.ServiceType
+                                </td>
+
+                                <td>
+                                    @booking.EventDate.ToString("MMM dd, yyyy")
+                                </td>
+
+                                <td>
+                                    @formattedTime
+                                </td>
+
+                                <td>
+                                    @booking.DurationHours hour(s)
+                                </td>
+
+                                <td>
+                                    <partial name="_StatusBadge" model="booking.Status" />
+                                </td>
+
+                                <td class="text-end">
+
+                                    <div class="d-inline-flex gap-2">
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Details"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm kxn-btn-outline">
+
+                                            <i class="bi bi-eye me-1"></i>
+                                            View
+
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Edit"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm btn-primary">
+
+                                            <i class="bi bi-pencil me-1"></i>
+                                            Edit
+
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Delete"
+                                           asp-route-id="@booking.BookingId"
+                                           class="btn btn-sm btn-outline-danger">
+
+                                            <i class="bi bi-trash me-1"></i>
+                                            Delete
+
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    }
+
+</div>

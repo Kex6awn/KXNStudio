@@ -1,0 +1,16 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.PageHeaderViewModel
+
+<div class="kxn-page-header">
+    <div>
+        <h1 class="kxn-page-title">
+            @Model.Title
+        </h1>
+
+        @if (!string.IsNullOrWhiteSpace(Model.Description))
+        {
+            <p class="kxn-page-description">
+                @Model.Description
+            </p>
+        }
+    </div>
+</div>

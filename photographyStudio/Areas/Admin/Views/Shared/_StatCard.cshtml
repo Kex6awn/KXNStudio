@@ -1,0 +1,26 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+
+<div class="kxn-stat-card">
+
+    <div class="d-flex justify-content-between align-items-start gap-3">
+
+        <div>
+            <p class="kxn-stat-label">
+                @Model.Label
+            </p>
+
+            <h2 class="kxn-stat-value @Model.ValueClass">
+                @Model.Value
+            </h2>
+        </div>
+
+        @if (!string.IsNullOrWhiteSpace(Model.IconClass))
+        {
+            <div class="kxn-stat-icon">
+                <i class="@Model.IconClass"></i>
+            </div>
+        }
+
+    </div>
+
+</div>
