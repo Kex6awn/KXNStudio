@@ -1,123 +1,211 @@
 ﻿@model List<KxnPhotoStudio.Models.Client>
+@using KxnPhotoStudio.Models.ViewModels
 
 @{
     ViewData["Title"] = "Clients";
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = "Clients",
+                Description = "View your customers and their booking history."
+            };
+
+    var totalClients = Model.Count;
+
+    var returningClients = Model.Count(c =>
+        c.Bookings.Count > 1);
+
+    var totalBookings = Model.Sum(c =>
+        c.Bookings.Count);
 }
 
-<div class="container-fluid py-4">
+<div class="container-fluid kxn-page">
 
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">Clients</h1>
-            <p class="text-muted mb-0">
-                View your customers and their booking history.
-            </p>
+    <partial name="_PageHeader"
+             model="pageHeader" />
+
+    <!-- Client Summary -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl-4">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Total Clients",
+                         Value = totalClients.ToString(),
+                         IconClass = "bi bi-people"
+                     }' />
+
         </div>
+
+        <div class="col-md-6 col-xl-4">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Returning Clients",
+                         Value = returningClients.ToString(),
+                         ValueClass = "text-success",
+                         IconClass = "bi bi-arrow-repeat"
+                     }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl-4">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Total Client Bookings",
+                         Value = totalBookings.ToString(),
+                         IconClass = "bi bi-calendar-check"
+                     }' />
+
+        </div>
+
     </div>
 
-    <div class="card shadow-sm border-0">
-        <div class="card-body p-0">
+    @if (Model.Any())
+    {
+        <div class="kxn-table-wrapper">
 
-            @if (Model.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+            <div class="table-responsive">
 
-                        <thead class="table-dark">
+                <table class="table kxn-table">
+
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Bookings</th>
+                            <th>Last Session</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var client in Model)
+                        {
+                            var lastBooking = client.Bookings
+                            .OrderByDescending(b => b.EventDate)
+                            .ThenByDescending(b => b.StartTime)
+                            .FirstOrDefault();
+
                             <tr>
-                                <th class="ps-4">Client</th>
-                                <th>Email</th>
-                                <th>Phone</th>
-                                <th>Bookings</th>
-                                <th>Last Session</th>
-                                <th class="text-end pe-4">Actions</th>
-                            </tr>
-                        </thead>
 
-                        <tbody>
-                            @foreach (var client in Model)
-                            {
-                                var lastBooking = client.Bookings
-                                .OrderByDescending(b => b.EventDate)
-                                .ThenByDescending(b => b.StartTime)
-                                .FirstOrDefault();
+                                <td>
 
-                                <tr>
-                                    <td class="ps-4">
-                                        <div class="fw-semibold">
-                                            @client.FullName
-                                        </div>
+                                    <div class="fw-semibold">
+                                        @client.FullName
+                                    </div>
 
-                                        <small class="text-muted">
-                                            Client since @client.CreatedAt.ToString("MMM yyyy")
-                                        </small>
-                                    </td>
+                                    <small class="text-muted">
+                                        Client since
+                                        @client.CreatedAt.ToString("MMM yyyy")
+                                    </small>
 
-                                    <td>
-                                        <a href="mailto:@client.Email"
+                                </td>
+
+                                <td>
+
+                                    <a href="mailto:@client.Email"
+                                       class="text-decoration-none">
+                                        @client.Email
+                                    </a>
+
+                                </td>
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(client.PhoneNumber))
+                                    {
+                                        <a href="tel:@client.PhoneNumber"
                                            class="text-decoration-none">
-                                            @client.Email
+                                            @client.PhoneNumber
                                         </a>
-                                    </td>
-
-                                    <td>
-                                        @if (!string.IsNullOrWhiteSpace(client.PhoneNumber))
-                                        {
-                                            <a href="tel:@client.PhoneNumber"
-                                               class="text-decoration-none">
-                                                @client.PhoneNumber
-                                            </a>
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">Not provided</span>
-                                        }
-                                    </td>
-
-                                    <td>
-                                        <span class="badge bg-dark">
-                                            @client.Bookings.Count
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            Not provided
                                         </span>
-                                    </td>
+                                    }
 
-                                    <td>
-                                        @if (lastBooking != null)
-                                        {
-                                            @lastBooking.EventDate.ToString("MMM dd, yyyy")
-                                        }
-                                        else
-                                        {
-                                            <span class="text-muted">No bookings</span>
-                                        }
-                                    </td>
+                                </td>
 
-                                    <td class="text-end pe-4">
-                                        <a asp-area="Admin"
-                                           asp-controller="Clients"
-                                           asp-action="Details"
-                                           asp-route-id="@client.ClientId"
-                                           class="btn btn-sm btn-info">
-                                            View
-                                        </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
+                                <td>
 
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <h5 class="text-muted">No clients yet</h5>
-                    <p class="text-muted mb-0">
-                        Clients will appear here after they submit bookings.
-                    </p>
-                </div>
-            }
+                                    <span class="kxn-status kxn-status-pending">
+                                        @client.Bookings.Count
+                                    </span>
+
+                                </td>
+
+                                <td>
+
+                                    @if (lastBooking != null)
+                                    {
+                                        @lastBooking.EventDate.ToString("MMM dd, yyyy")
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            No bookings
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Clients"
+                                       asp-action="Details"
+                                       asp-route-id="@client.ClientId"
+                                       class="btn btn-sm kxn-btn-outline">
+
+                                        <i class="bi bi-eye me-1"></i>
+                                        View
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
 
         </div>
-    </div>
+    }
+    else
+    {
+        <div class="kxn-card">
+
+            <div class="kxn-empty-state">
+
+                <div class="kxn-empty-icon">
+                    <i class="bi bi-people"></i>
+                </div>
+
+                <h4 class="kxn-empty-title">
+                    No clients yet
+                </h4>
+
+                <p class="kxn-empty-description">
+                    Clients will appear here after they submit bookings.
+                </p>
+
+            </div>
+
+        </div>
+    }
 
 </div>

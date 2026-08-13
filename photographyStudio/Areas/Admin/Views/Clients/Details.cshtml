@@ -1,167 +1,259 @@
 ﻿@model KxnPhotoStudio.Models.Client
+@using KxnPhotoStudio.Models.ViewModels
 
 @{
     ViewData["Title"] = "Client Details";
 
-    var confirmedCount = Model.Bookings.Count(b => b.Status == "Confirmed");
-    var pendingCount = Model.Bookings.Count(b => b.Status == "Pending");
-    var cancelledCount = Model.Bookings.Count(b => b.Status == "Cancelled");
+    var confirmedCount = Model.Bookings.Count(b =>
+        string.Equals(
+            b.Status,
+            "Confirmed",
+            StringComparison.OrdinalIgnoreCase));
+
+    var pendingCount = Model.Bookings.Count(b =>
+        string.Equals(
+            b.Status,
+            "Pending",
+            StringComparison.OrdinalIgnoreCase));
+
+    var cancelledCount = Model.Bookings.Count(b =>
+        string.Equals(
+            b.Status,
+            "Cancelled",
+            StringComparison.OrdinalIgnoreCase));
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = Model.FullName,
+                Description = "Client profile, notes, and booking history."
+            };
 }
 
-@if (TempData["SuccessMessage"] != null)
-{
-    <div class="alert alert-success alert-dismissible fade show">
-        @TempData["SuccessMessage"]
+<div class="container-fluid kxn-page">
 
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
+    <!-- Page Header -->
+    <partial name="_PageHeader"
+             model="pageHeader" />
 
-@if (TempData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger alert-dismissible fade show">
-        @TempData["ErrorMessage"]
-
-        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-    </div>
-}
-
-<div class="container-fluid py-4">
-
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">@Model.FullName</h1>
-            <p class="text-muted mb-0">
-                Client profile and booking history.
-            </p>
-        </div>
+    <div class="d-flex justify-content-end mb-4">
 
         <a asp-area="Admin"
            asp-controller="Clients"
            asp-action="Index"
-           class="btn btn-secondary">
+           class="btn kxn-btn-outline">
+
+            <i class="bi bi-arrow-left me-1"></i>
             Back to Clients
+
         </a>
+
     </div>
+
+
+    <!-- Messages -->
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show">
+
+            @TempData["ErrorMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert">
+            </button>
+
+        </div>
+    }
+
+
+    <!-- Client Overview -->
 
     <div class="row g-4 mb-4">
 
-        <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h4 class="fw-bold mb-4">Contact Information</h4>
+        <!-- Contact Information -->
+        <div class="col-xl-4">
 
-                    <p class="text-muted mb-1">Email</p>
-                    <p>
-                        <a href="mailto:@Model.Email"
-                           class="text-decoration-none">
-                            @Model.Email
-                        </a>
+            <div class="kxn-card h-100">
+
+                <div class="kxn-card-header">
+
+                    <h4 class="kxn-card-title">
+                        Contact Information
+                    </h4>
+
+                    <p class="kxn-card-description">
+                        Primary contact details for this client.
                     </p>
 
-                    <p class="text-muted mb-1">Phone</p>
-                    <p>
+                </div>
+
+                <div class="kxn-card-body">
+
+                    <div class="mb-4">
+
+                        <p class="text-muted mb-1">
+                            Email
+                        </p>
+
+                        <a href="mailto:@Model.Email"
+                           class="fw-semibold text-decoration-none">
+                            @Model.Email
+                        </a>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <p class="text-muted mb-1">
+                            Phone
+                        </p>
+
                         @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
                         {
                             <a href="tel:@Model.PhoneNumber"
-                               class="text-decoration-none">
+                               class="fw-semibold text-decoration-none">
                                 @Model.PhoneNumber
                             </a>
                         }
                         else
                         {
-                            <span>Not provided</span>
+                            <span class="text-muted">
+                                Not provided
+                            </span>
                         }
-                    </p>
 
-                    <p class="text-muted mb-1">Client Since</p>
-                    <p class="mb-0">
-                        @Model.CreatedAt.ToString("MMMM dd, yyyy")
-                    </p>
+                    </div>
+
+                    <div>
+
+                        <p class="text-muted mb-1">
+                            Client Since
+                        </p>
+
+                        <p class="fw-semibold mb-0">
+                            @Model.CreatedAt.ToString("MMMM dd, yyyy")
+                        </p>
+
+                    </div>
+
                 </div>
+
             </div>
+
         </div>
 
-        <div class="col-lg-8">
+
+        <!-- Client Statistics -->
+        <div class="col-xl-8">
+
             <div class="row g-3">
 
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <p class="text-muted mb-2">Total Bookings</p>
-                            <h2 class="fw-bold mb-0">
-                                @Model.Bookings.Count
-                            </h2>
-                        </div>
-                    </div>
+
+                    <partial name="_StatCard"
+                             model='new StatCardViewModel
+                             {
+                                 Label = "Total Bookings",
+                                 Value = Model.Bookings.Count.ToString(),
+                                 IconClass = "bi bi-calendar-check"
+                             }' />
+
                 </div>
 
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <p class="text-muted mb-2">Confirmed</p>
-                            <h2 class="fw-bold text-success mb-0">
-                                @confirmedCount
-                            </h2>
-                        </div>
-                    </div>
+
+                    <partial name="_StatCard"
+                             model='new StatCardViewModel
+                             {
+                                 Label = "Confirmed",
+                                 Value = confirmedCount.ToString(),
+                                 ValueClass = "text-success",
+                                 IconClass = "bi bi-check-circle"
+                             }' />
+
                 </div>
 
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <p class="text-muted mb-2">Pending</p>
-                            <h2 class="fw-bold text-warning mb-0">
-                                @pendingCount
-                            </h2>
-                        </div>
-                    </div>
+
+                    <partial name="_StatCard"
+                             model='new StatCardViewModel
+                             {
+                                 Label = "Pending",
+                                 Value = pendingCount.ToString(),
+                                 IconClass = "bi bi-hourglass-split"
+                             }' />
+
                 </div>
 
                 <div class="col-sm-6 col-xl-3">
-                    <div class="card shadow-sm border-0 h-100">
-                        <div class="card-body">
-                            <p class="text-muted mb-2">Cancelled</p>
-                            <h2 class="fw-bold text-secondary mb-0">
-                                @cancelledCount
-                            </h2>
-                        </div>
-                    </div>
+
+                    <partial name="_StatCard"
+                             model='new StatCardViewModel
+                             {
+                                 Label = "Cancelled",
+                                 Value = cancelledCount.ToString(),
+                                 ValueClass = "text-secondary",
+                                 IconClass = "bi bi-slash-circle"
+                             }' />
+
                 </div>
 
             </div>
+
         </div>
 
     </div>
 
-    <!-- Notes Timeline -->
 
-    <div class="card shadow-sm border-0 mt-4 client-notes-card">
+    <!-- Client Notes -->
 
-        <div class="card-header bg-white py-3 d-flex justify-content-between align-items-center">
+    <div class="kxn-card mt-4 client-notes-card">
+
+        <div class="kxn-card-header d-flex justify-content-between align-items-center">
 
             <div>
-                <h4 class="fw-bold mb-1">
+
+                <h4 class="kxn-card-title">
+
                     <i class="bi bi-journal-text me-2"></i>
                     Client Notes
+
                 </h4>
 
-                <p class="text-muted mb-0">
+                <p class="kxn-card-description">
                     Preferences, reminders, and important client details.
                 </p>
+
             </div>
 
             <button type="button"
                     class="btn btn-success"
                     data-bs-toggle="modal"
                     data-bs-target="#addNoteModal">
-                <i class="bi bi-plus-circle me-2"></i>
+
+                <i class="bi bi-plus-circle me-1"></i>
                 Add Note
+
             </button>
 
         </div>
 
-        <div class="card-body p-4">
+
+        <div class="kxn-card-body">
 
             @if (Model.Notes.Any())
             {
@@ -172,63 +264,91 @@
                         <div class="note-item">
 
                             <div class="note-marker">
+
                                 <i class="bi bi-sticky"></i>
+
                             </div>
+
 
                             <div class="note-content">
 
                                 <div class="note-meta">
+
                                     <div class="d-flex align-items-center gap-2">
+
                                         <i class="bi bi-clock text-secondary"></i>
 
                                         <span class="fw-semibold">
-                                            @(note.CreatedAt.ToLocalTime()
-                                                .ToString("MMM dd, yyyy 'at' h:mm tt"))
+
+                                            @(note.CreatedAt
+                                                .ToLocalTime()
+                                                .ToString(
+                                                "MMM dd, yyyy 'at' h:mm tt"))
+
                                         </span>
+
                                     </div>
 
                                     @if (note.UpdatedAt.HasValue)
                                     {
                                         <small class="text-muted d-block mt-1">
+
                                             Last edited:
-                                            @(note.UpdatedAt.Value.ToLocalTime()
-                                                .ToString("MMM dd, yyyy 'at' h:mm tt"))
+
+                                            @(note.UpdatedAt.Value
+                                                .ToLocalTime()
+                                                .ToString(
+                                                "MMM dd, yyyy 'at' h:mm tt"))
+
                                         </small>
                                     }
+
                                 </div>
+
 
                                 <div class="note-body">
                                     @note.Content
                                 </div>
 
+
                                 <div class="note-actions">
+
                                     <button type="button"
                                             class="btn btn-sm btn-primary"
                                             data-bs-toggle="modal"
                                             data-bs-target="#editNoteModal-@note.ClientNoteId">
+
                                         <i class="bi bi-pencil me-1"></i>
                                         Edit
+
                                     </button>
 
                                     <button type="button"
-                                            class="btn btn-sm btn-danger"
+                                            class="btn btn-sm btn-outline-danger"
                                             data-bs-toggle="modal"
                                             data-bs-target="#deleteNoteModal-@note.ClientNoteId">
+
                                         <i class="bi bi-trash me-1"></i>
                                         Delete
+
                                     </button>
+
                                 </div>
 
                             </div>
+
                         </div>
 
-                        <!-- Edit modal -->
+
+                        <!-- Edit Note Modal -->
+
                         <div class="modal fade"
                              id="editNoteModal-@note.ClientNoteId"
                              tabindex="-1"
                              aria-hidden="true">
 
                             <div class="modal-dialog modal-dialog-centered">
+
                                 <div class="modal-content">
 
                                     <form asp-area="Admin"
@@ -237,6 +357,7 @@
                                           method="post">
 
                                         <div class="modal-header">
+
                                             <h5 class="modal-title">
                                                 Edit Client Note
                                             </h5>
@@ -245,7 +366,9 @@
                                                     class="btn-close"
                                                     data-bs-dismiss="modal">
                                             </button>
+
                                         </div>
+
 
                                         <div class="modal-body">
 
@@ -267,7 +390,9 @@
 
                                         </div>
 
+
                                         <div class="modal-footer">
+
                                             <button type="button"
                                                     class="btn btn-secondary"
                                                     data-bs-dismiss="modal">
@@ -278,21 +403,27 @@
                                                     class="btn btn-success">
                                                 Save Changes
                                             </button>
+
                                         </div>
 
                                     </form>
 
                                 </div>
+
                             </div>
+
                         </div>
 
-                        <!-- Delete modal -->
+
+                        <!-- Delete Note Modal -->
+
                         <div class="modal fade"
                              id="deleteNoteModal-@note.ClientNoteId"
                              tabindex="-1"
                              aria-hidden="true">
 
                             <div class="modal-dialog modal-dialog-centered">
+
                                 <div class="modal-content">
 
                                     <form asp-area="Admin"
@@ -301,6 +432,7 @@
                                           method="post">
 
                                         <div class="modal-header">
+
                                             <h5 class="modal-title">
                                                 Delete Client Note
                                             </h5>
@@ -309,7 +441,9 @@
                                                     class="btn-close"
                                                     data-bs-dismiss="modal">
                                             </button>
+
                                         </div>
+
 
                                         <div class="modal-body">
 
@@ -328,7 +462,9 @@
 
                                         </div>
 
+
                                         <div class="modal-footer">
+
                                             <button type="button"
                                                     class="btn btn-secondary"
                                                     data-bs-dismiss="modal">
@@ -339,12 +475,15 @@
                                                     class="btn btn-danger">
                                                 Delete Note
                                             </button>
+
                                         </div>
 
                                     </form>
 
                                 </div>
+
                             </div>
+
                         </div>
                     }
 
@@ -352,97 +491,111 @@
             }
             else
             {
-                <div class="text-center py-5">
-                    <i class="bi bi-journal-x fs-1 text-muted"></i>
+                <div class="kxn-empty-state">
 
-                    <h5 class="text-muted mt-3">
+                    <div class="kxn-empty-icon">
+                        <i class="bi bi-journal-x"></i>
+                    </div>
+
+                    <h5 class="kxn-empty-title">
                         No client notes yet
                     </h5>
 
-                    <p class="text-muted mb-0">
+                    <p class="kxn-empty-description">
                         Add preferences, reminders, or session details here.
                     </p>
+
                 </div>
             }
 
         </div>
+
     </div>
 
-    <!-- Booking History Card-->
 
-    <div class="card shadow-sm border-0 mt-4">
+    <!-- Booking History -->
 
-        <div class="card-header bg-white py-3">
-            <h4 class="fw-bold mb-1">Booking History</h4>
-            <p class="text-muted mb-0">
+    <div class="kxn-card mt-4">
+
+        <div class="kxn-card-header">
+
+            <h4 class="kxn-card-title">
+                Booking History
+            </h4>
+
+            <p class="kxn-card-description">
                 All bookings connected to this client.
             </p>
+
         </div>
 
-        <div class="card-body p-0">
 
-            @if (Model.Bookings.Any())
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle mb-0">
+        @if (Model.Bookings.Any())
+        {
+            <div class="table-responsive">
 
-                        <thead class="table-light">
+                <table class="table kxn-table">
+
+                    <thead>
+
+                        <tr>
+                            <th>Service</th>
+                            <th>Date</th>
+                            <th>Time</th>
+                            <th>Duration</th>
+                            <th>Status</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+
+                    </thead>
+
+
+                    <tbody>
+
+                        @foreach (var booking in Model.Bookings)
+                        {
+                            var formattedTime = DateTime.Today
+                            .Add(booking.StartTime)
+                            .ToString("h:mm tt");
+
                             <tr>
-                                <th class="ps-4">Service</th>
-                                <th>Date</th>
-                                <th>Time</th>
-                                <th>Duration</th>
-                                <th>Status</th>
-                                <th class="text-end pe-4">Actions</th>
-                            </tr>
-                        </thead>
 
-                        <tbody>
-                            @foreach (var booking in Model.Bookings)
-                            {
-                                var formattedTime = DateTime.Today
-                                .Add(booking.StartTime)
-                                .ToString("h:mm tt");
+                                <td class="fw-semibold">
+                                    @booking.ServiceType
+                                </td>
 
-                                var badgeClass = booking.Status switch
-                                {
-                                    "Pending" => "bg-warning text-dark",
-                                    "Confirmed" => "bg-success",
-                                    "Declined" => "bg-danger",
-                                    "Cancelled" => "bg-secondary",
-                                    _ => "bg-dark"
-                                };
+                                <td>
+                                    @booking.EventDate.ToString("MMM dd, yyyy")
+                                </td>
 
-                                <tr>
-                                    <td class="ps-4 fw-semibold">
-                                        @booking.ServiceType
-                                    </td>
+                                <td>
+                                    @formattedTime
+                                </td>
 
-                                    <td>
-                                        @booking.EventDate.ToString("MMM dd, yyyy")
-                                    </td>
+                                <td>
+                                    @booking.DurationHours hour(s)
+                                </td>
 
-                                    <td>
-                                        @formattedTime
-                                    </td>
+                                <td>
 
-                                    <td>
-                                        @booking.DurationHours hour(s)
-                                    </td>
+                                    <partial name="_StatusBadge"
+                                             model="booking.Status" />
 
-                                    <td>
-                                        <span class="badge @badgeClass">
-                                            @booking.Status
-                                        </span>
-                                    </td>
+                                </td>
 
-                                    <td class="text-end pe-4">
+                                <td class="text-end">
+
+                                    <div class="d-inline-flex gap-2">
+
                                         <a asp-area="Admin"
                                            asp-controller="Bookings"
                                            asp-action="Details"
                                            asp-route-id="@booking.BookingId"
-                                           class="btn btn-sm btn-info">
+                                           class="btn btn-sm kxn-btn-outline">
+
+                                            <i class="bi bi-eye me-1"></i>
                                             View
+
                                         </a>
 
                                         <a asp-area="Admin"
@@ -450,35 +603,56 @@
                                            asp-action="Edit"
                                            asp-route-id="@booking.BookingId"
                                            class="btn btn-sm btn-primary">
+
+                                            <i class="bi bi-pencil me-1"></i>
                                             Edit
+
                                         </a>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
 
-                    </table>
-                </div>
-            }
-            else
-            {
-                <div class="text-center py-5">
-                    <p class="text-muted mb-0">
-                        This client has no booking history.
-                    </p>
-                </div>
-            }
+                                    </div>
 
-        </div>
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="kxn-empty-state">
+
+                <div class="kxn-empty-icon">
+                    <i class="bi bi-calendar-x"></i>
+                </div>
+
+                <h5 class="kxn-empty-title">
+                    No booking history
+                </h5>
+
+                <p class="kxn-empty-description">
+                    This client does not have any bookings yet.
+                </p>
+
+            </div>
+        }
+
     </div>
 
+
     <!-- Add Note Modal -->
+
     <div class="modal fade"
          id="addNoteModal"
          tabindex="-1"
          aria-hidden="true">
 
         <div class="modal-dialog modal-dialog-centered">
+
             <div class="modal-content">
 
                 <form asp-area="Admin"
@@ -487,6 +661,7 @@
                       method="post">
 
                     <div class="modal-header">
+
                         <h5 class="modal-title">
                             Add Client Note
                         </h5>
@@ -495,7 +670,9 @@
                                 class="btn-close"
                                 data-bs-dismiss="modal">
                         </button>
+
                     </div>
+
 
                     <div class="modal-body">
 
@@ -522,7 +699,9 @@
 
                     </div>
 
+
                     <div class="modal-footer">
+
                         <button type="button"
                                 class="btn btn-secondary"
                                 data-bs-dismiss="modal">
@@ -533,19 +712,24 @@
                                 class="btn btn-success">
                             Save Note
                         </button>
+
                     </div>
 
                 </form>
 
             </div>
+
         </div>
+
     </div>
 
 </div>
 
+
 @section Styles
 {
     <style>
+
         .client-notes-card {
             border-radius: 16px;
         }
@@ -629,18 +813,20 @@
             border-top: 1px solid #eeeeee;
         }
 
+
         @@media (max-width: 575.98px) {
-            .client-notes-card .card-header {
+
+            .client-notes-card .kxn-card-header {
                 flex-direction: column;
                 align-items: stretch !important;
                 gap: 15px;
             }
 
-                .client-notes-card .card-header .btn {
+                .client-notes-card .kxn-card-header .btn {
                     width: 100%;
                 }
 
-            .client-notes-card .card-body {
+            .client-notes-card .kxn-card-body {
                 padding: 16px !important;
             }
 
@@ -678,6 +864,6 @@
                 flex-wrap: wrap;
             }
         }
+
     </style>
-}
 }
