@@ -1,58 +1,119 @@
 ﻿@model KxnPhotoStudio.Models.ViewModels.CreateInvoiceViewModel
+@using KxnPhotoStudio.Models.ViewModels
 
 @{
     ViewData["Title"] = "Create Invoice";
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = "Create Invoice",
+                Description = "Create an invoice for this confirmed booking."
+            };
 }
 
-<div class="container-fluid py-4">
+<div class="container-fluid kxn-page">
 
-    <div class="d-flex justify-content-between align-items-start mb-4">
-        <div>
-            <h1 class="fw-bold mb-1">Create Invoice</h1>
-            <p class="text-muted mb-0">
-                Create an invoice for this confirmed booking.
-            </p>
-        </div>
+    <partial name="_PageHeader"
+             model="pageHeader" />
+
+    <div class="d-flex justify-content-end mb-4">
 
         <a asp-area="Admin"
            asp-controller="Bookings"
            asp-action="Details"
            asp-route-id="@Model.BookingId"
-           class="btn btn-secondary">
+           class="btn kxn-btn-outline">
+
+            <i class="bi bi-arrow-left me-1"></i>
             Back to Booking
+
         </a>
+
     </div>
+
 
     <div class="row g-4">
 
+        <!-- Booking Summary -->
         <div class="col-lg-4">
-            <div class="card shadow-sm border-0 h-100">
-                <div class="card-body p-4">
-                    <h4 class="fw-bold mb-4">
+
+            <div class="kxn-card h-100">
+
+                <div class="kxn-card-header">
+
+                    <h3 class="kxn-card-title">
                         Booking Summary
-                    </h4>
+                    </h3>
 
-                    <p class="text-muted mb-1">Client</p>
-                    <p class="fw-semibold">
-                        @Model.ClientName
+                    <p class="kxn-card-description">
+                        Booking information connected to this invoice.
                     </p>
 
-                    <p class="text-muted mb-1">Service</p>
-                    <p class="fw-semibold">
-                        @Model.ServiceType
-                    </p>
-
-                    <p class="text-muted mb-1">Event Date</p>
-                    <p class="fw-semibold mb-0">
-                        @Model.EventDate.ToString("MMMM dd, yyyy")
-                    </p>
                 </div>
+
+                <div class="kxn-card-body">
+
+                    <div class="mb-4">
+
+                        <p class="text-muted mb-1">
+                            Client
+                        </p>
+
+                        <p class="fw-semibold mb-0">
+                            @Model.ClientName
+                        </p>
+
+                    </div>
+
+                    <div class="mb-4">
+
+                        <p class="text-muted mb-1">
+                            Service
+                        </p>
+
+                        <p class="fw-semibold mb-0">
+                            @Model.ServiceType
+                        </p>
+
+                    </div>
+
+                    <div>
+
+                        <p class="text-muted mb-1">
+                            Event Date
+                        </p>
+
+                        <p class="fw-semibold mb-0">
+                            @Model.EventDate.ToString("MMMM dd, yyyy")
+                        </p>
+
+                    </div>
+
+                </div>
+
             </div>
+
         </div>
 
+
+        <!-- Invoice Form -->
         <div class="col-lg-8">
-            <div class="card shadow-sm border-0">
-                <div class="card-body p-4">
+
+            <div class="kxn-card">
+
+                <div class="kxn-card-header">
+
+                    <h3 class="kxn-card-title">
+                        Invoice Details
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        Enter pricing, deposit requirements, due date, and optional notes.
+                    </p>
+
+                </div>
+
+                <div class="kxn-card-body">
 
                     <form asp-area="Admin"
                           asp-controller="Invoices"
@@ -62,91 +123,127 @@
                         <input asp-for="BookingId"
                                type="hidden" />
 
+
                         <div asp-validation-summary="ModelOnly"
                              class="alert alert-danger">
                         </div>
 
-                        <div class="row g-3">
 
+                        <div class="row g-4">
+
+                            <!-- Subtotal -->
                             <div class="col-md-6">
+
                                 <label asp-for="Subtotal"
-                                       class="form-label">
+                                       class="kxn-form-label">
                                 </label>
 
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+
+                                    <span class="input-group-text">
+                                        $
+                                    </span>
 
                                     <input asp-for="Subtotal"
                                            class="form-control"
                                            step="0.01"
                                            min="0" />
+
                                 </div>
 
                                 <span asp-validation-for="Subtotal"
                                       class="text-danger">
                                 </span>
+
                             </div>
 
+
+                            <!-- Tax -->
                             <div class="col-md-6">
+
                                 <label asp-for="Tax"
-                                       class="form-label">
+                                       class="kxn-form-label">
                                 </label>
 
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+
+                                    <span class="input-group-text">
+                                        $
+                                    </span>
 
                                     <input asp-for="Tax"
                                            class="form-control"
                                            step="0.01"
                                            min="0" />
+
                                 </div>
 
                                 <span asp-validation-for="Tax"
                                       class="text-danger">
                                 </span>
+
                             </div>
 
+
+                            <!-- Discount -->
                             <div class="col-md-6">
+
                                 <label asp-for="Discount"
-                                       class="form-label">
+                                       class="kxn-form-label">
                                 </label>
 
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+
+                                    <span class="input-group-text">
+                                        $
+                                    </span>
 
                                     <input asp-for="Discount"
                                            class="form-control"
                                            step="0.01"
                                            min="0" />
+
                                 </div>
 
                                 <span asp-validation-for="Discount"
                                       class="text-danger">
                                 </span>
+
                             </div>
 
+
+                            <!-- Deposit -->
                             <div class="col-md-6">
+
                                 <label asp-for="DepositRequired"
-                                       class="form-label">
+                                       class="kxn-form-label">
                                 </label>
 
                                 <div class="input-group">
-                                    <span class="input-group-text">$</span>
+
+                                    <span class="input-group-text">
+                                        $
+                                    </span>
 
                                     <input asp-for="DepositRequired"
                                            class="form-control"
                                            step="0.01"
                                            min="0" />
+
                                 </div>
 
                                 <span asp-validation-for="DepositRequired"
                                       class="text-danger">
                                 </span>
+
                             </div>
 
+
+                            <!-- Due Date -->
                             <div class="col-md-6">
+
                                 <label asp-for="DueDate"
-                                       class="form-label">
+                                       class="kxn-form-label">
                                 </label>
 
                                 <input asp-for="DueDate"
@@ -155,46 +252,60 @@
                                 <span asp-validation-for="DueDate"
                                       class="text-danger">
                                 </span>
+
                             </div>
 
+
+                            <!-- Notes -->
                             <div class="col-12">
+
                                 <label asp-for="Notes"
-                                       class="form-label">
+                                       class="kxn-form-label">
                                 </label>
 
                                 <textarea asp-for="Notes"
                                           class="form-control"
                                           rows="5"
-                                          maxlength="2000">
-                                </textarea>
+                                          maxlength="2000"
+                                          placeholder="Optional invoice notes"></textarea>
 
                                 <span asp-validation-for="Notes"
                                       class="text-danger">
                                 </span>
+
                             </div>
 
                         </div>
 
-                        <div class="d-flex justify-content-end gap-2 mt-4">
+
+                        <div class="kxn-form-actions">
+
                             <a asp-area="Admin"
                                asp-controller="Bookings"
                                asp-action="Details"
                                asp-route-id="@Model.BookingId"
-                               class="btn btn-secondary">
+                               class="btn kxn-btn-outline">
+
                                 Cancel
+
                             </a>
 
                             <button type="submit"
                                     class="btn btn-success">
+
                                 <i class="bi bi-receipt me-1"></i>
                                 Create Invoice
+
                             </button>
+
                         </div>
 
                     </form>
 
                 </div>
+
             </div>
+
         </div>
 
     </div>
