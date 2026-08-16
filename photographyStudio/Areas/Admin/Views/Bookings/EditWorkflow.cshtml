@@ -1,0 +1,244 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.SessionWorkflowViewModel
+@using KxnPhotoStudio.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Post-Session Workflow";
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = "Post-Session Workflow",
+                Description = "Track photo editing, gallery readiness, and client delivery."
+            };
+}
+
+<div class="container-fluid kxn-page">
+
+    <partial name="_PageHeader"
+             model="pageHeader" />
+
+    <div class="d-flex justify-content-end mb-4">
+
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Details"
+           asp-route-id="@Model.BookingId"
+           class="btn kxn-btn-outline">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Booking
+
+        </a>
+
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-xl-9">
+
+            <div class="kxn-card">
+
+                <div class="kxn-card-header">
+
+                    <h3 class="kxn-card-title">
+                        Session Progress
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        Update the editing and delivery progress for this completed session.
+                    </p>
+
+                </div>
+
+                <div class="kxn-card-body">
+
+                    <form asp-area="Admin"
+                          asp-controller="Bookings"
+                          asp-action="EditWorkflow"
+                          method="post">
+
+                        <input asp-for="BookingId"
+                               type="hidden" />
+
+                        <input asp-for="SessionWorkflowId"
+                               type="hidden" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+
+                        <!-- Workflow Statuses -->
+
+                        <div class="row g-4">
+
+                            <div class="col-md-6">
+
+                                <label asp-for="EditingStatus"
+                                       class="kxn-form-label">
+                                    Editing Status
+                                </label>
+
+                                <select asp-for="EditingStatus"
+                                        class="form-select">
+
+                                    <option value="Not Started">
+                                        Not Started
+                                    </option>
+
+                                    <option value="In Progress">
+                                        In Progress
+                                    </option>
+
+                                    <option value="Completed">
+                                        Completed
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="EditingStatus"
+                                      class="text-danger">
+                                </span>
+
+                                <div class="form-text">
+                                    Track the progress of photo editing for this session.
+                                </div>
+
+                            </div>
+
+
+                            <div class="col-md-6">
+
+                                <label asp-for="DeliveryStatus"
+                                       class="kxn-form-label">
+                                    Delivery Status
+                                </label>
+
+                                <select asp-for="DeliveryStatus"
+                                        class="form-select">
+
+                                    <option value="Not Delivered">
+                                        Not Delivered
+                                    </option>
+
+                                    <option value="Ready">
+                                        Ready
+                                    </option>
+
+                                    <option value="Delivered">
+                                        Delivered
+                                    </option>
+
+                                </select>
+
+                                <span asp-validation-for="DeliveryStatus"
+                                      class="text-danger">
+                                </span>
+
+                                <div class="form-text">
+                                    Editing must be completed before the gallery can be ready or delivered.
+                                </div>
+
+                            </div>
+
+                        </div>
+
+
+                        <hr class="my-4" />
+
+
+                        <!-- Gallery -->
+
+                        <div class="mb-4">
+
+                            <label asp-for="GalleryUrl"
+                                   class="kxn-form-label">
+                            </label>
+
+                            <div class="input-group">
+
+                                <span class="input-group-text">
+                                    <i class="bi bi-link-45deg"></i>
+                                </span>
+
+                                <input asp-for="GalleryUrl"
+                                       class="form-control"
+                                       type="url"
+                                       placeholder="https://gallery.example.com/client-gallery" />
+
+                            </div>
+
+                            <span asp-validation-for="GalleryUrl"
+                                  class="text-danger">
+                            </span>
+
+                            <div class="form-text">
+                                Optional link to the client's online photo gallery.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Delivery Notes -->
+
+                        <div>
+
+                            <label asp-for="DeliveryNotes"
+                                   class="kxn-form-label">
+                            </label>
+
+                            <textarea asp-for="DeliveryNotes"
+                                      class="form-control"
+                                      rows="5"
+                                      maxlength="1000"
+                                      placeholder="Add delivery instructions, gallery details, or other notes..."></textarea>
+
+                            <span asp-validation-for="DeliveryNotes"
+                                  class="text-danger">
+                            </span>
+
+                            <div class="form-text">
+                                Maximum 1,000 characters.
+                            </div>
+
+                        </div>
+
+
+                        <!-- Actions -->
+
+                        <div class="kxn-form-actions">
+
+                            <a asp-area="Admin"
+                               asp-controller="Bookings"
+                               asp-action="Details"
+                               asp-route-id="@Model.BookingId"
+                               class="btn kxn-btn-outline">
+
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-primary">
+
+                                <i class="bi bi-check-circle me-1"></i>
+                                Save Workflow
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

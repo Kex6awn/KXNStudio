@@ -1,4 +1,5 @@
 ﻿@model KxnPhotoStudio.Models.Booking
+@using KxnPhotoStudio.Models
 @using KxnPhotoStudio.Models.ViewModels
 
 @{
@@ -65,6 +66,24 @@
                     <i class="bi bi-receipt me-1"></i>
                     View Invoice
                 </a>
+        }
+
+        @if (string.Equals(
+                Model.Status,
+                BookingStatuses.Completed,
+                StringComparison.OrdinalIgnoreCase)
+                && Model.SessionWorkflow != null)
+        {
+            <a asp-area="Admin"
+               asp-controller="Bookings"
+               asp-action="EditWorkflow"
+               asp-route-bookingId="@Model.BookingId"
+               class="btn btn-dark">
+
+                <i class="bi bi-images me-1"></i>
+                Update Workflow
+
+            </a>
         }
 
     </div>
@@ -260,19 +279,21 @@
 
                         @if (Model.Invoice != null)
                         {
-                                <a asp-area="Admin"
-                                   asp-controller="Invoices"
-                                   asp-action="Details"
-                                   asp-route-id="@Model.Invoice.InvoiceId"
-                                   class="fw-semibold text-decoration-none">
+                            <a asp-area="Admin"
+                               asp-controller="Invoices"
+                               asp-action="Details"
+                               asp-route-id="@Model.Invoice.InvoiceId"
+                               class="fw-semibold text-decoration-none">
+
                                 @Model.Invoice.InvoiceNumber
-                                </a>
+
+                            </a>
                         }
                         else
                         {
-                                <span class="text-muted">
-                                    Not created
-                                </span>
+                            <span class="text-muted">
+                                Not created
+                            </span>
                         }
 
                     </div>
@@ -284,7 +305,9 @@
                         </span>
 
                         <span>
-                            @(Model.CreatedAt.ToLocalTime().ToString("MMM dd, yyyy"))
+                            @(Model.CreatedAt
+                                .ToLocalTime()
+                                .ToString("MMM dd, yyyy"))
                         </span>
 
                     </div>
@@ -293,8 +316,212 @@
 
             </div>
 
-        </div>
 
+            @if (string.Equals(
+            Model.Status,
+            BookingStatuses.Completed,
+            StringComparison.OrdinalIgnoreCase))
+            {
+                <div class="kxn-card mt-4">
+
+                    <div class="kxn-card-header">
+
+                        <div class="d-flex justify-content-between align-items-start gap-3">
+
+                            <div>
+                                <h3 class="kxn-card-title">
+                                    Post-Session Workflow
+                                </h3>
+
+                                <p class="kxn-card-description">
+                                    Track editing and gallery delivery.
+                                </p>
+                            </div>
+
+                            <a asp-area="Admin"
+                               asp-controller="Bookings"
+                               asp-action="EditWorkflow"
+                               asp-route-bookingId="@Model.BookingId"
+                               class="btn btn-sm kxn-btn-outline">
+
+                                <i class="bi bi-pencil me-1"></i>
+                                Update
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                    <div class="kxn-card-body">
+
+                        @if (Model.SessionWorkflow != null)
+                        {
+                            var editingClass =
+                            Model.SessionWorkflow.EditingStatus switch
+                            {
+                                "Completed" => "kxn-status-paid",
+                                "In Progress" => "kxn-status-partial",
+                                _ => "kxn-status-pending"
+                            };
+
+                            var deliveryClass =
+                            Model.SessionWorkflow.DeliveryStatus switch
+                            {
+                                "Delivered" => "kxn-status-paid",
+                                "Ready" => "kxn-status-partial",
+                                _ => "kxn-status-pending"
+                            };
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                <span class="text-muted">
+                                    Editing
+                                </span>
+
+                                <span class="kxn-status @editingClass">
+                                    @Model.SessionWorkflow.EditingStatus
+                                </span>
+
+                            </div>
+
+                            <hr />
+
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+
+                                <span class="text-muted">
+                                    Delivery
+                                </span>
+
+                                <span class="kxn-status @deliveryClass">
+                                    @Model.SessionWorkflow.DeliveryStatus
+                                </span>
+
+                            </div>
+
+                            @if (Model.SessionWorkflow.EditingStartedAt.HasValue)
+                            {
+                                <div class="d-flex justify-content-between mb-3">
+
+                                    <span class="text-muted">
+                                        Editing Started
+                                    </span>
+
+                                    <span>
+                                        @(Model.SessionWorkflow.EditingStartedAt.Value
+                                            .ToLocalTime()
+                                            .ToString("MMM dd, yyyy"))
+                                    </span>
+
+                                </div>
+                            }
+
+                            @if (Model.SessionWorkflow.EditingCompletedAt.HasValue)
+                            {
+                                <div class="d-flex justify-content-between mb-3">
+
+                                    <span class="text-muted">
+                                        Editing Completed
+                                    </span>
+
+                                    <span>
+                                        @(Model.SessionWorkflow.EditingCompletedAt.Value
+                                            .ToLocalTime()
+                                            .ToString("MMM dd, yyyy"))
+                                    </span>
+
+                                </div>
+                            }
+
+                            @if (Model.SessionWorkflow.DeliveredAt.HasValue)
+                            {
+                                <div class="d-flex justify-content-between mb-3">
+
+                                    <span class="text-muted">
+                                        Delivered
+                                    </span>
+
+                                    <span>
+                                        @(Model.SessionWorkflow.DeliveredAt.Value
+                                            .ToLocalTime()
+                                            .ToString("MMM dd, yyyy"))
+                                    </span>
+
+                                </div>
+                            }
+
+                            <hr />
+
+                            <div class="mb-3">
+
+                                <p class="text-muted mb-1">
+                                    Gallery
+                                </p>
+
+                                @if (!string.IsNullOrWhiteSpace(
+                               Model.SessionWorkflow.GalleryUrl))
+                                {
+                                    <a href="@Model.SessionWorkflow.GalleryUrl"
+                                       target="_blank"
+                                       rel="noopener noreferrer"
+                                       class="fw-semibold text-decoration-none">
+
+                                        <i class="bi bi-box-arrow-up-right me-1"></i>
+                                        Open Client Gallery
+
+                                    </a>
+                                }
+                                else
+                                {
+                                    <span class="text-muted">
+                                        Not added yet
+                                    </span>
+                                }
+
+                            </div>
+
+                            @if (!string.IsNullOrWhiteSpace(
+                           Model.SessionWorkflow.DeliveryNotes))
+                            {
+                                <div>
+
+                                    <p class="text-muted mb-1">
+                                        Delivery Notes
+                                    </p>
+
+                                    <p class="mb-0"
+                                       style="white-space:pre-line;">
+                                        @Model.SessionWorkflow.DeliveryNotes
+                                    </p>
+
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <div class="kxn-empty-state py-4">
+
+                                <div class="kxn-empty-icon">
+                                    <i class="bi bi-images"></i>
+                                </div>
+
+                                <h5 class="kxn-empty-title">
+                                    Workflow not started
+                                </h5>
+
+                                <p class="kxn-empty-description">
+                                    Start tracking editing and gallery delivery for this session.
+                                </p>
+
+                            </div>
+                        }
+
+                    </div>
+
+                </div>
+            }
+
+        </div>
     </div>
 
 </div>

@@ -16,15 +16,18 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
         private readonly IBookingStatusService _bookingStatusService;
+        private readonly ISessionWorkflowService _sessionWorkflowService;
 
         public BookingsController(
             AppDbContext context,
             IEmailService emailService,
-            IBookingStatusService bookingStatusService)
+            IBookingStatusService bookingStatusService,
+            ISessionWorkflowService sessionWorkflowService)
         {
             _context = context;
             _emailService = emailService;
             _bookingStatusService = bookingStatusService;
+            _sessionWorkflowService = sessionWorkflowService;
         }
 
         // List all bookings
@@ -44,6 +47,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
             var booking = await _context.Bookings
                 .Include(b => b.Invoice)
+                .Include(b => b.SessionWorkflow)
                 .FirstOrDefaultAsync(b => b.BookingId == id);
 
             if (booking == null) return NotFound();
@@ -478,6 +482,85 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> EditWorkflow(int bookingId)
+        {
+            var booking = await _context.Bookings
+                .Include(b => b.SessionWorkflow)
+                .FirstOrDefaultAsync(b => b.BookingId == bookingId);
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            if (!string.Equals(
+                    booking.Status,
+                    BookingStatuses.Completed,
+                    StringComparison.OrdinalIgnoreCase))
+            {
+                TempData["WarningMessage"] =
+                    "Post-session workflow is only available for completed bookings.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id = bookingId });
+            }
+
+            var workflow =
+                booking.SessionWorkflow ??
+                await _sessionWorkflowService
+                    .GetOrCreateForBookingAsync(bookingId);
+
+            var model = new SessionWorkflowViewModel
+            {
+                BookingId = booking.BookingId,
+                SessionWorkflowId = workflow.SessionWorkflowId,
+                EditingStatus = workflow.EditingStatus,
+                DeliveryStatus = workflow.DeliveryStatus,
+                GalleryUrl = workflow.GalleryUrl,
+                DeliveryNotes = workflow.DeliveryNotes
+            };
+
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditWorkflow(
+            SessionWorkflowViewModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            try
+            {
+                await _sessionWorkflowService.UpdateWorkflowAsync(
+                    model.SessionWorkflowId,
+                    model.EditingStatus,
+                    model.DeliveryStatus,
+                    model.GalleryUrl,
+                    model.DeliveryNotes);
+
+                TempData["SuccessMessage"] =
+                    "Post-session workflow updated successfully.";
+
+                return RedirectToAction(
+                    nameof(Details),
+                    new { id = model.BookingId });
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(
+                    string.Empty,
+                    ex.Message);
+
+                return View(model);
+            }
         }
     }
 }
