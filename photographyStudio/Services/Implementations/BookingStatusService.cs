@@ -8,10 +8,12 @@ namespace KxnPhotoStudio.Services.Implementations
     public class BookingStatusService : IBookingStatusService
     {
         private readonly AppDbContext _context;
+        private readonly ISessionWorkflowService _sessionWorkflowService;
 
-        public BookingStatusService(AppDbContext context)
+        public BookingStatusService(AppDbContext context, ISessionWorkflowService sessionWorkflowService)
         {
             _context = context;
+            _sessionWorkflowService = sessionWorkflowService;
         }
 
         public async Task UpdateStatusAsync(
@@ -44,6 +46,15 @@ namespace KxnPhotoStudio.Services.Implementations
             booking.Status = newStatus;
 
             await _context.SaveChangesAsync();
+
+            if (string.Equals(
+                newStatus,
+                BookingStatuses.Completed,
+                StringComparison.OrdinalIgnoreCase))
+            {
+                await _sessionWorkflowService
+                    .GetOrCreateForBookingAsync(booking.BookingId);
+            }
         }
 
         private static bool IsValidTransition(
