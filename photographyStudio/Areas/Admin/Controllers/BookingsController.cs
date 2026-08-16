@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using KxnPhotoStudio.Models.ViewModels;
 using KxnPhotoStudio.Services.Interfaces;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
 {
@@ -14,11 +15,16 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
     {
         private readonly AppDbContext _context;
         private readonly IEmailService _emailService;
+        private readonly IBookingStatusService _bookingStatusService;
 
-        public BookingsController(AppDbContext context, IEmailService emailService)
+        public BookingsController(
+            AppDbContext context,
+            IEmailService emailService,
+            IBookingStatusService bookingStatusService)
         {
             _context = context;
             _emailService = emailService;
+            _bookingStatusService = bookingStatusService;
         }
 
         // List all bookings
@@ -48,15 +54,41 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         // Edit status
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var booking = await _context.Bookings.FindAsync(id);
-            if (booking == null) return NotFound();
+
+            if (booking == null)
+            {
+                return NotFound();
+            }
+
+            var allowedStatuses =
+                _bookingStatusService.GetAllowedStatuses(
+                    booking.Status);
 
             var model = new BookingStatusViewModel
             {
                 BookingId = booking.BookingId,
-                Status = booking.Status
+                CurrentStatus = booking.Status,
+                Status = booking.Status,
+
+                AllowedStatuses = allowedStatuses
+                    .Select(status =>
+                        new SelectListItem
+                        {
+                            Value = status,
+                            Text = status
+                        })
+                    .ToList(),
+
+                IsFinalStatus =
+                    booking.Status == BookingStatuses.Completed ||
+                    booking.Status == BookingStatuses.Declined ||
+                    booking.Status == BookingStatuses.Cancelled
             };
 
             return View(model);
@@ -112,9 +144,20 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
             var oldStatus = existing.Status;
 
-            existing.Status = model.Status;
+            try
+            {
+                await _bookingStatusService.UpdateStatusAsync(
+                    id,
+                    model.Status);
+            }
+            catch (InvalidOperationException ex)
+            {
+                ModelState.AddModelError(
+                    nameof(model.Status),
+                    ex.Message);
 
-            await _context.SaveChangesAsync();
+                return View(model);
+            }
 
             var statusChanged = !string.Equals(
                 oldStatus,

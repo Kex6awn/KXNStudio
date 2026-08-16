@@ -149,6 +149,11 @@
     color: #0f5132;
 }
 
+.kxn-status-completed {
+    background-color: #d1e7dd;
+    color: #0f5132;
+}
+
 .kxn-status-partial {
     background-color: #fff3cd;
     color: #664d03;

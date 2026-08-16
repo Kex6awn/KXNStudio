@@ -1,25 +1,158 @@
 ﻿@model KxnPhotoStudio.Models.ViewModels.BookingStatusViewModel
+@using KxnPhotoStudio.Models.ViewModels
 
 @{
     ViewData["Title"] = "Update Booking Status";
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = "Update Booking Status",
+                Description = "Change the current status of this booking."
+            };
 }
 
-<h2>Update Booking Status</h2>
+<div class="container-fluid kxn-page">
 
-<form asp-action="Edit" method="post">
-    <input type="hidden" asp-for="BookingId" />
+    <partial name="_PageHeader"
+             model="pageHeader" />
 
-    <div class="mb-3">
-        <label asp-for="Status" class="form-label"></label>
-        <select asp-for="Status" class="form-select">
-            <option value="Pending">Pending</option>
-            <option value="Confirmed">Confirmed</option>
-            <option value="Declined">Declined</option>
-            <option value="Cancelled">Cancelled</option>
-        </select>
-        <span asp-validation-for="Status" class="text-danger"></span>
+    <div class="d-flex justify-content-end mb-4">
+
+        <a asp-area="Admin"
+           asp-controller="Bookings"
+           asp-action="Index"
+           class="btn kxn-btn-outline">
+
+            <i class="bi bi-arrow-left me-1"></i>
+            Back to Bookings
+
+        </a>
+
     </div>
 
-    <button type="submit" class="btn btn-primary">Update</button>
-    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
-</form>
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7 col-xl-6">
+
+            <div class="kxn-card">
+
+                <div class="kxn-card-header">
+
+                    <h3 class="kxn-card-title">
+                        Booking Status
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        @if (Model.IsFinalStatus)
+                        {
+                            <text>This booking has reached a final status.</text>
+                        }
+                        else
+                        {
+                            <text>Select the new status for this booking.</text>
+                        }
+                    </p>
+
+                </div>
+
+                <div class="kxn-card-body">
+
+                    <form asp-area="Admin"
+                          asp-controller="Bookings"
+                          asp-action="Edit"
+                          asp-route-id="@Model.BookingId"
+                          method="post">
+
+                        <input type="hidden"
+                               asp-for="BookingId" />
+
+                        <div asp-validation-summary="ModelOnly"
+                             class="alert alert-danger">
+                        </div>
+
+                        @if (Model.IsFinalStatus)
+                        {
+                            <div class="alert alert-light border">
+
+                                <div class="d-flex align-items-center gap-2 mb-2">
+                                    <i class="bi bi-lock-fill text-secondary"></i>
+
+                                    <strong>
+                                        Final Booking Status
+                                    </strong>
+                                </div>
+
+                                <p class="mb-2">
+                                    This booking is currently:
+                                </p>
+
+                                <partial name="_StatusBadge"
+                                         model="Model.CurrentStatus" />
+
+                                <p class="text-muted small mt-3 mb-0">
+                                    Completed, declined, and cancelled bookings cannot be changed to another status.
+                                </p>
+
+                            </div>
+
+                            <input asp-for="Status"
+                                   type="hidden"
+                                   value="@Model.CurrentStatus" />
+                        }
+                        else
+                        {
+                            <div class="kxn-form-section">
+
+                                <label asp-for="Status"
+                                       class="kxn-form-label">
+                                </label>
+
+                                <select asp-for="Status"
+                                        asp-items="Model.AllowedStatuses"
+                                        class="form-select">
+                                </select>
+
+                                <span asp-validation-for="Status"
+                                      class="text-danger">
+                                </span>
+
+                            </div>
+                        }
+
+                        <div class="kxn-form-actions">
+
+                            <a asp-area="Admin"
+                               asp-controller="Bookings"
+                               asp-action="Index"
+                               class="btn kxn-btn-outline">
+                                Cancel
+                            </a>
+
+                            @if (!Model.IsFinalStatus)
+                            {
+                                <button type="submit"
+                                        class="btn btn-primary">
+
+                                    <i class="bi bi-check-circle me-1"></i>
+                                    Update Status
+
+                                </button>
+                            }
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

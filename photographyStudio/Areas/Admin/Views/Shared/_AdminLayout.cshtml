@@ -43,15 +43,34 @@
 
             <div class="collapse navbar-collapse" id="adminNav">
                 <ul class="navbar-nav ms-auto">
+
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="Admin" asp-controller="Dashboard" asp-action="Index">Dashboard</a>
+                        <a class="nav-link @(currentController == "Dashboard" ? "active fw-semibold" : "")"
+                           asp-area="Admin"
+                           asp-controller="Dashboard"
+                           asp-action="Index">
+                            Dashboard
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="Admin" asp-controller="Categories" asp-action="Index">Categories</a>
+                        <a class="nav-link @(currentController == "Categories" ? "active fw-semibold" : "")"
+                           asp-area="Admin"
+                           asp-controller="Categories"
+                           asp-action="Index">
+                            Categories
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="Admin" asp-controller="Photos" asp-action="Index">Photos</a>
+                        <a class="nav-link @(currentController == "Photos" ? "active fw-semibold" : "")"
+                           asp-area="Admin"
+                           asp-controller="Photos"
+                           asp-action="Index">
+                            Photos
+                        </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Bookings" && currentAction != "Calendar" ? "active fw-semibold" : "")"
                            asp-area="Admin"
@@ -60,39 +79,52 @@
                             Bookings
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Bookings" && currentAction == "Calendar" ? "active fw-semibold" : "")"
                            asp-area="Admin"
                            asp-controller="Bookings"
                            asp-action="Calendar">
-                            <!--<i class="bi bi-calendar3 me-1"></i>-->
                             Calendar
                         </a>
                     </li>
+
                     <li class="nav-item">
                         <a class="nav-link @(currentController == "Clients" ? "active fw-semibold" : "")"
                            asp-area="Admin"
                            asp-controller="Clients"
                            asp-action="Index">
-                            <!--<i class="bi bi-people me-1"></i>-->
                             Clients
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link"
+                        <a class="nav-link @(currentController == "Invoices" ? "active fw-semibold" : "")"
                            asp-area="Admin"
                            asp-controller="Invoices"
                            asp-action="Index">
-                            <!-- <i class="bi bi-receipt me-2"> --></i>
                             Invoices
                         </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="" asp-controller="Home" asp-action="Index">View Site</a>
+                        <a class="nav-link"
+                           asp-area=""
+                           asp-controller="Home"
+                           asp-action="Index">
+                            View Site
+                        </a>
                     </li>
+
                     <li class="nav-item">
-                        <a class="nav-link" asp-area="Admin" asp-controller="Auth" asp-action="Logout">Logout</a>
+                        <a class="nav-link"
+                           asp-area="Admin"
+                           asp-controller="Auth"
+                           asp-action="Logout">
+                            Logout
+                        </a>
                     </li>
+
                 </ul>
             </div>
         </div>

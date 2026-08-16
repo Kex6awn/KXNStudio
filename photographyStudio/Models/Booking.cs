@@ -41,7 +41,7 @@ namespace KxnPhotoStudio.Models
         public string? Message { get; set; }
 
         [StringLength(50)]
-        public string Status { get; set; } = "Pending";
+        public string Status { get; set; } = BookingStatuses.Pending;
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
