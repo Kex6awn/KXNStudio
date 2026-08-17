@@ -145,5 +145,14 @@ namespace KxnPhotoStudio.Services.Implementations
 
             await _context.SaveChangesAsync();
         }
+
+        public async Task<List<SessionWorkflow>> GetAllAsync()
+        {
+            return await _context.SessionWorkflows
+                .Include(w => w.Booking)
+                .OrderBy(w => w.DeliveryStatus == "Delivered")
+                .ThenByDescending(w => w.Booking.EventDate)
+                .ToListAsync();
+        }
     }
 }

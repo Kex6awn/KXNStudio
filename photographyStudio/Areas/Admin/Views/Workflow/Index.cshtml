@@ -1,0 +1,238 @@
+﻿@model KxnPhotoStudio.Models.ViewModels.WorkflowDashboardViewModel
+@using KxnPhotoStudio.Models.ViewModels
+
+@{
+    ViewData["Title"] = "Session Workflow";
+
+    var pageHeader = new PageHeaderViewModel
+            {
+                Title = "Session Workflow",
+                Description = "Track completed sessions through editing and gallery delivery."
+            };
+}
+
+<div class="container-fluid kxn-page">
+
+    <partial name="_PageHeader"
+             model="pageHeader" />
+
+    <!-- Workflow Stats -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6 col-xl-3">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Needs Editing",
+                         Value = Model.NeedsEditingCount.ToString(),
+                         IconClass = "bi bi-hourglass"
+                     }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Editing",
+                         Value = Model.EditingCount.ToString(),
+                         IconClass = "bi bi-pencil-square"
+                     }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Ready to Deliver",
+                         Value = Model.ReadyToDeliverCount.ToString(),
+                         ValueClass = "text-success",
+                         IconClass = "bi bi-box-seam"
+                     }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl-3">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Delivered",
+                         Value = Model.DeliveredCount.ToString(),
+                         ValueClass = "text-success",
+                         IconClass = "bi bi-check-circle"
+                     }' />
+
+        </div>
+
+    </div>
+
+
+    @if (!Model.Workflows.Any())
+    {
+        <div class="kxn-card">
+
+            <div class="kxn-empty-state">
+
+                <div class="kxn-empty-icon">
+                    <i class="bi bi-images"></i>
+                </div>
+
+                <h4 class="kxn-empty-title">
+                    No completed-session workflows yet
+                </h4>
+
+                <p class="kxn-empty-description">
+                    Workflows will appear here after bookings are marked completed.
+                </p>
+
+            </div>
+
+        </div>
+    }
+    else
+    {
+        <div class="kxn-table-wrapper">
+
+            <div class="table-responsive">
+
+                <table class="table kxn-table">
+
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Session Date</th>
+                            <th>Editing</th>
+                            <th>Delivery</th>
+                            <th>Gallery</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var workflow in Model.Workflows)
+                        {
+                            var editingClass =
+                            workflow.EditingStatus switch
+                            {
+                                "Completed" => "kxn-status-paid",
+                                "In Progress" => "kxn-status-partial",
+                                _ => "kxn-status-pending"
+                            };
+
+                            var deliveryClass =
+                            workflow.DeliveryStatus switch
+                            {
+                                "Delivered" => "kxn-status-paid",
+                                "Ready" => "kxn-status-partial",
+                                _ => "kxn-status-pending"
+                            };
+
+                            <tr>
+
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @workflow.Booking.FullName
+                                    </div>
+
+                                    <small class="text-muted">
+                                        @workflow.Booking.Email
+                                    </small>
+
+                                </td>
+
+                                <td>
+                                    @workflow.Booking.ServiceType
+                                </td>
+
+                                <td>
+                                    @(workflow.Booking.EventDate
+                                    .ToString("MMM dd, yyyy"))
+                                </td>
+
+                                <td>
+                                    <span class="kxn-status @editingClass">
+                                        @workflow.EditingStatus
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="kxn-status @deliveryClass">
+                                        @workflow.DeliveryStatus
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                   workflow.GalleryUrl))
+                                    {
+                                        <a href="@workflow.GalleryUrl"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="text-decoration-none">
+
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>
+                                            Open
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    <div class="d-inline-flex gap-2">
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="Details"
+                                           asp-route-id="@workflow.BookingId"
+                                           class="btn btn-sm kxn-btn-outline">
+
+                                            <i class="bi bi-eye me-1"></i>
+                                            View
+
+                                        </a>
+
+                                        <a asp-area="Admin"
+                                           asp-controller="Bookings"
+                                           asp-action="EditWorkflow"
+                                           asp-route-bookingId="@workflow.BookingId"
+                                           class="btn btn-sm btn-primary">
+
+                                            <i class="bi bi-pencil me-1"></i>
+                                            Update
+
+                                        </a>
+
+                                    </div>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        </div>
+    }
+
+</div>
