@@ -1,18 +1,21 @@
-﻿@model KxnPhotoStudio.Models.Booking
+﻿@model KxnPhotoStudio.Models.ViewModels.BookingDetailsViewModel
 @using KxnPhotoStudio.Models
 @using KxnPhotoStudio.Models.ViewModels
 
 @{
     ViewData["Title"] = "Booking Details";
 
+    var booking = Model.Booking;
+    var job = Model.JobCompletion;
+
     var formattedTime = DateTime.Today
-        .Add(Model.StartTime)
+        .Add(booking.StartTime)
         .ToString("h:mm tt");
 
     var pageHeader = new PageHeaderViewModel
             {
                 Title = "Booking Details",
-                Description = $"Review the booking for {Model.FullName}."
+                Description = $"Review the booking for {booking.FullName}."
             };
 }
 
@@ -21,63 +24,76 @@
     <partial name="_PageHeader"
              model="pageHeader" />
 
+
+    <!-- Actions -->
     <div class="d-flex flex-wrap justify-content-end gap-2 mb-4">
 
         <a asp-area="Admin"
            asp-controller="Bookings"
            asp-action="Index"
            class="btn kxn-btn-outline">
+
             <i class="bi bi-arrow-left me-1"></i>
             Back to Bookings
+
         </a>
 
         <a asp-area="Admin"
            asp-controller="Bookings"
            asp-action="Edit"
-           asp-route-id="@Model.BookingId"
+           asp-route-id="@booking.BookingId"
            class="btn btn-primary">
+
             <i class="bi bi-pencil me-1"></i>
             Edit Booking
+
         </a>
 
-        @if (string.Equals(
-               Model.Status,
-               "Confirmed",
-               StringComparison.OrdinalIgnoreCase)
-           && Model.Invoice == null)
-        {
-                <a asp-area="Admin"
-                   asp-controller="Invoices"
-                   asp-action="Create"
-                   asp-route-bookingId="@Model.BookingId"
-                   class="btn btn-success">
-                    <i class="bi bi-receipt me-1"></i>
-                    Create Invoice
-                </a>
-        }
-
-        @if (Model.Invoice != null)
-        {
-                <a asp-area="Admin"
-                   asp-controller="Invoices"
-                   asp-action="Details"
-                   asp-route-id="@Model.Invoice.InvoiceId"
-                   class="btn btn-success">
-                    <i class="bi bi-receipt me-1"></i>
-                    View Invoice
-                </a>
-        }
 
         @if (string.Equals(
-                Model.Status,
-                BookingStatuses.Completed,
-                StringComparison.OrdinalIgnoreCase)
-                && Model.SessionWorkflow != null)
+        booking.Status,
+        BookingStatuses.Confirmed,
+        StringComparison.OrdinalIgnoreCase)
+        && booking.Invoice == null)
+        {
+            <a asp-area="Admin"
+               asp-controller="Invoices"
+               asp-action="Create"
+               asp-route-bookingId="@booking.BookingId"
+               class="btn btn-success">
+
+                <i class="bi bi-receipt me-1"></i>
+                Create Invoice
+
+            </a>
+        }
+
+
+        @if (booking.Invoice != null)
+        {
+            <a asp-area="Admin"
+               asp-controller="Invoices"
+               asp-action="Details"
+               asp-route-id="@booking.Invoice.InvoiceId"
+               class="btn btn-success">
+
+                <i class="bi bi-receipt me-1"></i>
+                View Invoice
+
+            </a>
+        }
+
+
+        @if (string.Equals(
+        booking.Status,
+        BookingStatuses.Completed,
+        StringComparison.OrdinalIgnoreCase)
+        && booking.SessionWorkflow != null)
         {
             <a asp-area="Admin"
                asp-controller="Bookings"
                asp-action="EditWorkflow"
-               asp-route-bookingId="@Model.BookingId"
+               asp-route-bookingId="@booking.BookingId"
                class="btn btn-dark">
 
                 <i class="bi bi-images me-1"></i>
@@ -88,10 +104,13 @@
 
     </div>
 
+
     <div class="row g-4">
 
+        <!-- LEFT COLUMN -->
         <div class="col-lg-8">
 
+            <!-- Session Information -->
             <div class="kxn-card">
 
                 <div class="kxn-card-header">
@@ -99,6 +118,7 @@
                     <div class="d-flex justify-content-between align-items-start gap-3">
 
                         <div>
+
                             <h3 class="kxn-card-title">
                                 Session Information
                             </h3>
@@ -106,14 +126,16 @@
                             <p class="kxn-card-description">
                                 Booking and photography session details.
                             </p>
+
                         </div>
 
                         <partial name="_StatusBadge"
-                                 model="Model.Status" />
+                                 model="booking.Status" />
 
                     </div>
 
                 </div>
+
 
                 <div class="kxn-card-body">
 
@@ -126,41 +148,48 @@
                             </p>
 
                             <p class="fw-semibold mb-4">
-                                @Model.FullName
+                                @booking.FullName
                             </p>
+
 
                             <p class="text-muted mb-1">
                                 Email
                             </p>
 
                             <p class="mb-4">
-                                <a href="mailto:@Model.Email"
+
+                                <a href="mailto:@booking.Email"
                                    class="text-decoration-none">
-                                    @Model.Email
+                                    @booking.Email
                                 </a>
+
                             </p>
+
 
                             <p class="text-muted mb-1">
                                 Phone
                             </p>
 
                             <p class="mb-0">
-                                @if (!string.IsNullOrWhiteSpace(Model.PhoneNumber))
+
+                                @if (!string.IsNullOrWhiteSpace(booking.PhoneNumber))
                                 {
-                                        <a href="tel:@Model.PhoneNumber"
-                                           class="text-decoration-none">
-                                        @Model.PhoneNumber
-                                        </a>
+                                    <a href="tel:@booking.PhoneNumber"
+                                       class="text-decoration-none">
+                                        @booking.PhoneNumber
+                                    </a>
                                 }
                                 else
                                 {
-                                        <span class="text-muted">
-                                            Not provided
-                                        </span>
+                                    <span class="text-muted">
+                                        Not provided
+                                    </span>
                                 }
+
                             </p>
 
                         </div>
+
 
                         <div class="col-md-6">
 
@@ -169,16 +198,18 @@
                             </p>
 
                             <p class="fw-semibold mb-4">
-                                @Model.ServiceType
+                                @booking.ServiceType
                             </p>
+
 
                             <p class="text-muted mb-1">
                                 Session Date
                             </p>
 
                             <p class="mb-4">
-                                @Model.EventDate.ToString("MMMM dd, yyyy")
+                                @booking.EventDate.ToString("MMMM dd, yyyy")
                             </p>
+
 
                             <p class="text-muted mb-1">
                                 Time
@@ -188,12 +219,13 @@
                                 @formattedTime
                             </p>
 
+
                             <p class="text-muted mb-1">
                                 Duration
                             </p>
 
                             <p class="mb-0">
-                                @Model.DurationHours hour(s)
+                                @booking.DurationHours hour(s)
                             </p>
 
                         </div>
@@ -204,6 +236,8 @@
 
             </div>
 
+
+            <!-- Client Message -->
             <div class="kxn-card mt-4">
 
                 <div class="kxn-card-header">
@@ -218,20 +252,19 @@
 
                 </div>
 
+
                 <div class="kxn-card-body">
 
-                    @if (!string.IsNullOrWhiteSpace(Model.Message))
+                    @if (!string.IsNullOrWhiteSpace(booking.Message))
                     {
-                            <p class="mb-0"
-                               style="white-space:pre-wrap;">
-                            @Model.Message
-                            </p>
+                        <p class="mb-0"
+                           style="white-space:pre-line;">@booking.Message</p>
                     }
                     else
                     {
-                            <span class="text-muted">
-                                No additional message was provided.
-                            </span>
+                        <span class="text-muted">
+                            No additional message was provided.
+                        </span>
                     }
 
                 </div>
@@ -240,8 +273,11 @@
 
         </div>
 
+
+        <!-- RIGHT COLUMN -->
         <div class="col-lg-4">
 
+            <!-- Booking Summary -->
             <div class="kxn-card">
 
                 <div class="kxn-card-header">
@@ -256,6 +292,7 @@
 
                 </div>
 
+
                 <div class="kxn-card-body">
 
                     <div class="d-flex justify-content-between align-items-center mb-3">
@@ -265,11 +302,12 @@
                         </span>
 
                         <partial name="_StatusBadge"
-                                 model="Model.Status" />
+                                 model="booking.Status" />
 
                     </div>
 
                     <hr />
+
 
                     <div class="d-flex justify-content-between mb-3">
 
@@ -277,15 +315,15 @@
                             Invoice
                         </span>
 
-                        @if (Model.Invoice != null)
+                        @if (booking.Invoice != null)
                         {
                             <a asp-area="Admin"
                                asp-controller="Invoices"
                                asp-action="Details"
-                               asp-route-id="@Model.Invoice.InvoiceId"
+                               asp-route-id="@booking.Invoice.InvoiceId"
                                class="fw-semibold text-decoration-none">
 
-                                @Model.Invoice.InvoiceNumber
+                                @booking.Invoice.InvoiceNumber
 
                             </a>
                         }
@@ -298,6 +336,7 @@
 
                     </div>
 
+
                     <div class="d-flex justify-content-between">
 
                         <span class="text-muted">
@@ -305,7 +344,7 @@
                         </span>
 
                         <span>
-                            @(Model.CreatedAt
+                            @(booking.CreatedAt
                                 .ToLocalTime()
                                 .ToString("MMM dd, yyyy"))
                         </span>
@@ -317,8 +356,186 @@
             </div>
 
 
+            <!-- Job Completion -->
+            <div class="kxn-card mt-4">
+
+                <div class="kxn-card-header">
+
+                    <div class="d-flex justify-content-between align-items-start gap-3">
+
+                        <div>
+
+                            <h3 class="kxn-card-title">
+                                Job Completion
+                            </h3>
+
+                            <p class="kxn-card-description">
+                                Overall completion of this photography job.
+                            </p>
+
+                        </div>
+
+                        @if (job.IsJobComplete)
+                        {
+                            <span class="kxn-status kxn-status-paid">
+                                Complete
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="kxn-status kxn-status-partial">
+                                In Progress
+                            </span>
+                        }
+
+                    </div>
+
+                </div>
+
+
+                <div class="kxn-card-body">
+
+                    <!-- Session -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            @if (job.SessionCompleted)
+                            {
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-circle text-secondary"></i>
+                            }
+
+                            <span>
+                                Session Completed
+                            </span>
+
+                        </div>
+
+                        @if (job.SessionCompleted)
+                        {
+                            <span class="text-success fw-semibold">
+                                Complete
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                Pending
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <!-- Payment -->
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            @if (job.InvoicePaid)
+                            {
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-circle text-secondary"></i>
+                            }
+
+                            <span>
+                                Invoice Paid
+                            </span>
+
+                        </div>
+
+                        @if (job.InvoicePaid)
+                        {
+                            <span class="text-success fw-semibold">
+                                Paid
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                Outstanding
+                            </span>
+                        }
+
+                    </div>
+
+
+                    <!-- Delivery -->
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <div class="d-flex align-items-center gap-2">
+
+                            @if (job.GalleryDelivered)
+                            {
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                            }
+                            else
+                            {
+                                <i class="bi bi-circle text-secondary"></i>
+                            }
+
+                            <span>
+                                Gallery Delivered
+                            </span>
+
+                        </div>
+
+                        @if (job.GalleryDelivered)
+                        {
+                            <span class="text-success fw-semibold">
+                                Delivered
+                            </span>
+                        }
+                        else
+                        {
+                            <span class="text-muted">
+                                Pending
+                            </span>
+                        }
+
+                    </div>
+
+
+                    @if (job.IsJobComplete)
+                    {
+                        <div class="alert alert-success mt-4 mb-0">
+
+                            <div class="d-flex gap-2">
+
+                                <i class="bi bi-check-circle-fill"></i>
+
+                                <div>
+
+                                    <strong>
+                                        Job complete
+                                    </strong>
+
+                                    <div class="small">
+                                        The session, payment, and gallery delivery are all complete.
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+
+
+            <!-- Post-Session Workflow -->
             @if (string.Equals(
-            Model.Status,
+            booking.Status,
             BookingStatuses.Completed,
             StringComparison.OrdinalIgnoreCase))
             {
@@ -329,6 +546,7 @@
                         <div class="d-flex justify-content-between align-items-start gap-3">
 
                             <div>
+
                                 <h3 class="kxn-card-title">
                                     Post-Session Workflow
                                 </h3>
@@ -336,12 +554,13 @@
                                 <p class="kxn-card-description">
                                     Track editing and gallery delivery.
                                 </p>
+
                             </div>
 
                             <a asp-area="Admin"
                                asp-controller="Bookings"
                                asp-action="EditWorkflow"
-                               asp-route-bookingId="@Model.BookingId"
+                               asp-route-bookingId="@booking.BookingId"
                                class="btn btn-sm kxn-btn-outline">
 
                                 <i class="bi bi-pencil me-1"></i>
@@ -353,12 +572,13 @@
 
                     </div>
 
+
                     <div class="kxn-card-body">
 
-                        @if (Model.SessionWorkflow != null)
+                        @if (booking.SessionWorkflow != null)
                         {
                             var editingClass =
-                            Model.SessionWorkflow.EditingStatus switch
+                            booking.SessionWorkflow.EditingStatus switch
                             {
                                 "Completed" => "kxn-status-paid",
                                 "In Progress" => "kxn-status-partial",
@@ -366,13 +586,15 @@
                             };
 
                             var deliveryClass =
-                            Model.SessionWorkflow.DeliveryStatus switch
+                            booking.SessionWorkflow.DeliveryStatus switch
                             {
                                 "Delivered" => "kxn-status-paid",
                                 "Ready" => "kxn-status-partial",
                                 _ => "kxn-status-pending"
                             };
 
+
+                            <!-- Editing -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
 
                                 <span class="text-muted">
@@ -380,13 +602,15 @@
                                 </span>
 
                                 <span class="kxn-status @editingClass">
-                                    @Model.SessionWorkflow.EditingStatus
+                                    @booking.SessionWorkflow.EditingStatus
                                 </span>
 
                             </div>
 
                             <hr />
 
+
+                            <!-- Delivery -->
                             <div class="d-flex justify-content-between align-items-center mb-3">
 
                                 <span class="text-muted">
@@ -394,12 +618,13 @@
                                 </span>
 
                                 <span class="kxn-status @deliveryClass">
-                                    @Model.SessionWorkflow.DeliveryStatus
+                                    @booking.SessionWorkflow.DeliveryStatus
                                 </span>
 
                             </div>
 
-                            @if (Model.SessionWorkflow.EditingStartedAt.HasValue)
+
+                            @if (booking.SessionWorkflow.EditingStartedAt.HasValue)
                             {
                                 <div class="d-flex justify-content-between mb-3">
 
@@ -408,7 +633,7 @@
                                     </span>
 
                                     <span>
-                                        @(Model.SessionWorkflow.EditingStartedAt.Value
+                                        @(booking.SessionWorkflow.EditingStartedAt.Value
                                             .ToLocalTime()
                                             .ToString("MMM dd, yyyy"))
                                     </span>
@@ -416,7 +641,8 @@
                                 </div>
                             }
 
-                            @if (Model.SessionWorkflow.EditingCompletedAt.HasValue)
+
+                            @if (booking.SessionWorkflow.EditingCompletedAt.HasValue)
                             {
                                 <div class="d-flex justify-content-between mb-3">
 
@@ -425,7 +651,7 @@
                                     </span>
 
                                     <span>
-                                        @(Model.SessionWorkflow.EditingCompletedAt.Value
+                                        @(booking.SessionWorkflow.EditingCompletedAt.Value
                                             .ToLocalTime()
                                             .ToString("MMM dd, yyyy"))
                                     </span>
@@ -433,7 +659,8 @@
                                 </div>
                             }
 
-                            @if (Model.SessionWorkflow.DeliveredAt.HasValue)
+
+                            @if (booking.SessionWorkflow.DeliveredAt.HasValue)
                             {
                                 <div class="d-flex justify-content-between mb-3">
 
@@ -442,7 +669,7 @@
                                     </span>
 
                                     <span>
-                                        @(Model.SessionWorkflow.DeliveredAt.Value
+                                        @(booking.SessionWorkflow.DeliveredAt.Value
                                             .ToLocalTime()
                                             .ToString("MMM dd, yyyy"))
                                     </span>
@@ -452,6 +679,8 @@
 
                             <hr />
 
+
+                            <!-- Gallery -->
                             <div class="mb-3">
 
                                 <p class="text-muted mb-1">
@@ -459,9 +688,9 @@
                                 </p>
 
                                 @if (!string.IsNullOrWhiteSpace(
-                               Model.SessionWorkflow.GalleryUrl))
+                               booking.SessionWorkflow.GalleryUrl))
                                 {
-                                    <a href="@Model.SessionWorkflow.GalleryUrl"
+                                    <a href="@booking.SessionWorkflow.GalleryUrl"
                                        target="_blank"
                                        rel="noopener noreferrer"
                                        class="fw-semibold text-decoration-none">
@@ -480,8 +709,9 @@
 
                             </div>
 
+
                             @if (!string.IsNullOrWhiteSpace(
-                           Model.SessionWorkflow.DeliveryNotes))
+                           booking.SessionWorkflow.DeliveryNotes))
                             {
                                 <div>
 
@@ -490,9 +720,7 @@
                                     </p>
 
                                     <p class="mb-0"
-                                       style="white-space:pre-line;">
-                                        @Model.SessionWorkflow.DeliveryNotes
-                                    </p>
+                                       style="white-space:pre-line;">@booking.SessionWorkflow.DeliveryNotes</p>
 
                                 </div>
                             }
@@ -522,6 +750,7 @@
             }
 
         </div>
+
     </div>
 
 </div>

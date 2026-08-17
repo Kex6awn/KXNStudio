@@ -49,6 +49,7 @@ namespace KxnPhotoStudio
             builder.Services.AddScoped<IRazorViewRenderService, RazorViewRenderService>();
             builder.Services.AddScoped<IBookingStatusService, BookingStatusService>();
             builder.Services.AddScoped<ISessionWorkflowService, SessionWorkflowService>();
+            builder.Services.AddScoped<IJobCompletionService, JobCompletionService>();
 
             var app = builder.Build();
 

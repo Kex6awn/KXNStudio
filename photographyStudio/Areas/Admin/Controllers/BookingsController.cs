@@ -17,17 +17,20 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         private readonly IEmailService _emailService;
         private readonly IBookingStatusService _bookingStatusService;
         private readonly ISessionWorkflowService _sessionWorkflowService;
+        private readonly IJobCompletionService _jobCompletionService;
 
         public BookingsController(
             AppDbContext context,
             IEmailService emailService,
             IBookingStatusService bookingStatusService,
-            ISessionWorkflowService sessionWorkflowService)
+            ISessionWorkflowService sessionWorkflowService,
+            IJobCompletionService jobCompletionService)
         {
             _context = context;
             _emailService = emailService;
             _bookingStatusService = bookingStatusService;
             _sessionWorkflowService = sessionWorkflowService;
+            _jobCompletionService = jobCompletionService;
         }
 
         // List all bookings
@@ -52,7 +55,15 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
             if (booking == null) return NotFound();
 
-            return View(booking);
+            var jobCompletion = await _jobCompletionService.GetJobCompletionAsync(booking.BookingId);
+
+            var model = new BookingDetailsViewModel
+            {
+                Booking = booking,
+                JobCompletion = jobCompletion
+            };
+
+            return View(model);
         }
 
         // Edit status
