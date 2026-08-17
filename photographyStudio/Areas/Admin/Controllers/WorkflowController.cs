@@ -1,4 +1,5 @@
-﻿using KxnPhotoStudio.Models.ViewModels;
+﻿using KxnPhotoStudio.Models;
+using KxnPhotoStudio.Models.ViewModels;
 using KxnPhotoStudio.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -10,11 +11,14 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
     public class WorkflowController : Controller
     {
         private readonly ISessionWorkflowService _sessionWorkflowService;
+        private readonly IJobCompletionService _jobCompletionService;
 
         public WorkflowController(
-            ISessionWorkflowService sessionWorkflowService)
+            ISessionWorkflowService sessionWorkflowService,
+            IJobCompletionService jobCompletionService)
         {
             _sessionWorkflowService = sessionWorkflowService;
+            _jobCompletionService = jobCompletionService;
         }
 
         public async Task<IActionResult> Index()
@@ -22,22 +26,66 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             var workflows =
                 await _sessionWorkflowService.GetAllAsync();
 
+            var activeWorkflows =
+                new List<SessionWorkflow>();
+
+            var completedWorkflows =
+                new List<SessionWorkflow>();
+
+            foreach (var workflow in workflows)
+            {
+                var completion =
+                    await _jobCompletionService
+                        .GetJobCompletionAsync(workflow.BookingId);
+
+                if (completion.IsJobComplete)
+                {
+                    completedWorkflows.Add(workflow);
+                }
+                else
+                {
+                    activeWorkflows.Add(workflow);
+                }
+            }
+
             var model = new WorkflowDashboardViewModel
             {
-                NeedsEditingCount = workflows.Count(w =>
-                    w.EditingStatus == "Not Started"),
+                NeedsEditingCount = activeWorkflows.Count(w =>
+                    string.Equals(
+                        w.EditingStatus,
+                        "Not Started",
+                        StringComparison.OrdinalIgnoreCase)),
 
-                EditingCount = workflows.Count(w =>
-                    w.EditingStatus == "In Progress"),
+                EditingCount = activeWorkflows.Count(w =>
+                    string.Equals(
+                        w.EditingStatus,
+                        "In Progress",
+                        StringComparison.OrdinalIgnoreCase)),
 
-                ReadyToDeliverCount = workflows.Count(w =>
-                    w.EditingStatus == "Completed" &&
-                    w.DeliveryStatus == "Ready"),
+                ReadyToDeliverCount = activeWorkflows.Count(w =>
+                    string.Equals(
+                        w.EditingStatus,
+                        "Completed",
+                        StringComparison.OrdinalIgnoreCase)
+                    &&
+                    string.Equals(
+                        w.DeliveryStatus,
+                        "Ready",
+                        StringComparison.OrdinalIgnoreCase)),
 
                 DeliveredCount = workflows.Count(w =>
-                    w.DeliveryStatus == "Delivered"),
+                    string.Equals(
+                        w.DeliveryStatus,
+                        "Delivered",
+                        StringComparison.OrdinalIgnoreCase)),
 
-                Workflows = workflows
+                ActiveJobsCount = activeWorkflows.Count,
+
+                CompletedJobsCount = completedWorkflows.Count,
+
+                ActiveWorkflows = activeWorkflows,
+
+                CompletedWorkflows = completedWorkflows
             };
 
             return View(model);

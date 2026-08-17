@@ -12,7 +12,14 @@ namespace KxnPhotoStudio.Models.ViewModels
 
         public int DeliveredCount { get; set; }
 
-        public List<SessionWorkflow> Workflows { get; set; }
+        public int ActiveJobsCount { get; set; }
+
+        public int CompletedJobsCount { get; set; }
+
+        public List<SessionWorkflow> ActiveWorkflows { get; set; }
+            = new();
+
+        public List<SessionWorkflow> CompletedWorkflows { get; set; }
             = new();
     }
 }

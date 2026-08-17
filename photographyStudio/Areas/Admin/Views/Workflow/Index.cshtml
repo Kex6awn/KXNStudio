@@ -7,7 +7,7 @@
     var pageHeader = new PageHeaderViewModel
             {
                 Title = "Session Workflow",
-                Description = "Track completed sessions through editing and gallery delivery."
+                Description = "Track active photography jobs through editing, delivery, and final completion."
             };
 }
 
@@ -20,7 +20,6 @@
     <div class="row g-4 mb-4">
 
         <div class="col-md-6 col-xl-3">
-
             <partial name="_StatCard"
                      model='new StatCardViewModel
                      {
@@ -28,11 +27,9 @@
                          Value = Model.NeedsEditingCount.ToString(),
                          IconClass = "bi bi-hourglass"
                      }' />
-
         </div>
 
         <div class="col-md-6 col-xl-3">
-
             <partial name="_StatCard"
                      model='new StatCardViewModel
                      {
@@ -40,11 +37,9 @@
                          Value = Model.EditingCount.ToString(),
                          IconClass = "bi bi-pencil-square"
                      }' />
-
         </div>
 
         <div class="col-md-6 col-xl-3">
-
             <partial name="_StatCard"
                      model='new StatCardViewModel
                      {
@@ -53,11 +48,9 @@
                          ValueClass = "text-success",
                          IconClass = "bi bi-box-seam"
                      }' />
-
         </div>
 
         <div class="col-md-6 col-xl-3">
-
             <partial name="_StatCard"
                      model='new StatCardViewModel
                      {
@@ -66,38 +59,70 @@
                          ValueClass = "text-success",
                          IconClass = "bi bi-check-circle"
                      }' />
+        </div>
+
+    </div>
+
+    <!-- Job Totals -->
+    <div class="row g-4 mb-4">
+
+        <div class="col-md-6">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Active Jobs",
+                         Value = Model.ActiveJobsCount.ToString(),
+                         IconClass = "bi bi-briefcase"
+                     }' />
+
+        </div>
+
+        <div class="col-md-6">
+
+            <partial name="_StatCard"
+                     model='new StatCardViewModel
+                     {
+                         Label = "Completed Jobs",
+                         Value = Model.CompletedJobsCount.ToString(),
+                         ValueClass = "text-success",
+                         IconClass = "bi bi-check2-circle"
+                     }' />
 
         </div>
 
     </div>
 
 
-    @if (!Model.Workflows.Any())
-    {
-        <div class="kxn-card">
+    <!-- Active Jobs -->
+    <div class="kxn-card mb-4">
 
-            <div class="kxn-empty-state">
+        <div class="kxn-card-header">
 
-                <div class="kxn-empty-icon">
-                    <i class="bi bi-images"></i>
+            <div class="d-flex justify-content-between align-items-start gap-3">
+
+                <div>
+
+                    <h3 class="kxn-card-title">
+                        Active Jobs
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        Jobs that still require editing, payment, or gallery delivery.
+                    </p>
+
                 </div>
 
-                <h4 class="kxn-empty-title">
-                    No completed-session workflows yet
-                </h4>
-
-                <p class="kxn-empty-description">
-                    Workflows will appear here after bookings are marked completed.
-                </p>
+                <span class="kxn-status kxn-status-partial">
+                    @Model.ActiveJobsCount Active
+                </span>
 
             </div>
 
         </div>
-    }
-    else
-    {
-        <div class="kxn-table-wrapper">
 
+        @if (Model.ActiveWorkflows.Any())
+        {
             <div class="table-responsive">
 
                 <table class="table kxn-table">
@@ -116,7 +141,7 @@
 
                     <tbody>
 
-                        @foreach (var workflow in Model.Workflows)
+                        @foreach (var workflow in Model.ActiveWorkflows)
                         {
                             var editingClass =
                             workflow.EditingStatus switch
@@ -154,7 +179,7 @@
 
                                 <td>
                                     @(workflow.Booking.EventDate
-                                    .ToString("MMM dd, yyyy"))
+                                        .ToString("MMM dd, yyyy"))
                                 </td>
 
                                 <td>
@@ -231,8 +256,180 @@
                 </table>
 
             </div>
+        }
+        else
+        {
+            <div class="kxn-empty-state">
+
+                <div class="kxn-empty-icon">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+
+                <h4 class="kxn-empty-title">
+                    No active jobs
+                </h4>
+
+                <p class="kxn-empty-description">
+                    There are currently no completed sessions waiting on editing, payment, or delivery.
+                </p>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- Completed Jobs -->
+    <div class="kxn-card">
+
+        <div class="kxn-card-header">
+
+            <div class="d-flex justify-content-between align-items-start gap-3">
+
+                <div>
+
+                    <h3 class="kxn-card-title">
+                        Completed Jobs
+                    </h3>
+
+                    <p class="kxn-card-description">
+                        Jobs where the session, invoice, and gallery delivery are all complete.
+                    </p>
+
+                </div>
+
+                <span class="kxn-status kxn-status-paid">
+                    @Model.CompletedJobsCount Complete
+                </span>
+
+            </div>
 
         </div>
-    }
+
+        @if (Model.CompletedWorkflows.Any())
+        {
+            <div class="table-responsive">
+
+                <table class="table kxn-table">
+
+                    <thead>
+                        <tr>
+                            <th>Client</th>
+                            <th>Service</th>
+                            <th>Session Date</th>
+                            <th>Editing</th>
+                            <th>Delivery</th>
+                            <th>Gallery</th>
+                            <th class="text-end">Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        @foreach (var workflow in Model.CompletedWorkflows)
+                        {
+                            <tr>
+
+                                <td>
+
+                                    <div class="fw-semibold">
+                                        @workflow.Booking.FullName
+                                    </div>
+
+                                    <small class="text-muted">
+                                        @workflow.Booking.Email
+                                    </small>
+
+                                </td>
+
+                                <td>
+                                    @workflow.Booking.ServiceType
+                                </td>
+
+                                <td>
+                                    @(workflow.Booking.EventDate
+                                        .ToString("MMM dd, yyyy"))
+                                </td>
+
+                                <td>
+                                    <span class="kxn-status kxn-status-paid">
+                                        @workflow.EditingStatus
+                                    </span>
+                                </td>
+
+                                <td>
+                                    <span class="kxn-status kxn-status-paid">
+                                        @workflow.DeliveryStatus
+                                    </span>
+                                </td>
+
+                                <td>
+
+                                    @if (!string.IsNullOrWhiteSpace(
+                                   workflow.GalleryUrl))
+                                    {
+                                        <a href="@workflow.GalleryUrl"
+                                           target="_blank"
+                                           rel="noopener noreferrer"
+                                           class="text-decoration-none">
+
+                                            <i class="bi bi-box-arrow-up-right me-1"></i>
+                                            Open
+
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <span class="text-muted">
+                                            —
+                                        </span>
+                                    }
+
+                                </td>
+
+                                <td class="text-end">
+
+                                    <a asp-area="Admin"
+                                       asp-controller="Bookings"
+                                       asp-action="Details"
+                                       asp-route-id="@workflow.BookingId"
+                                       class="btn btn-sm kxn-btn-outline">
+
+                                        <i class="bi bi-eye me-1"></i>
+                                        View
+
+                                    </a>
+
+                                </td>
+
+                            </tr>
+                        }
+
+                    </tbody>
+
+                </table>
+
+            </div>
+        }
+        else
+        {
+            <div class="kxn-empty-state">
+
+                <div class="kxn-empty-icon">
+                    <i class="bi bi-briefcase"></i>
+                </div>
+
+                <h4 class="kxn-empty-title">
+                    No completed jobs yet
+                </h4>
+
+                <p class="kxn-empty-description">
+                    Jobs will move here automatically after the session is complete, the invoice is paid, and the gallery is delivered.
+                </p>
+
+            </div>
+        }
+
+    </div>
 
 </div>
