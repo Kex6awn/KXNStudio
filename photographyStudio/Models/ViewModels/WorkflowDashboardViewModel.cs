@@ -16,6 +16,10 @@ namespace KxnPhotoStudio.Models.ViewModels
 
         public int CompletedJobsCount { get; set; }
 
+        public string? Search { get; set; }
+
+        public string? StatusFilter { get; set; }
+
         public List<SessionWorkflow> ActiveWorkflows { get; set; }
             = new();
 

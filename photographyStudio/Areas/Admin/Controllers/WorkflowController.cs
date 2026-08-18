@@ -21,7 +21,9 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             _jobCompletionService = jobCompletionService;
         }
 
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(
+            string? search,
+            string? statusFilter)
         {
             var workflows =
                 await _sessionWorkflowService.GetAllAsync();
@@ -48,40 +50,155 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                 }
             }
 
+            // -----------------------------------------
+            // OVERALL COUNTS BEFORE FILTERING
+            // -----------------------------------------
+
+            var needsEditingCount = activeWorkflows.Count(w =>
+                string.Equals(
+                    w.EditingStatus,
+                    "Not Started",
+                    StringComparison.OrdinalIgnoreCase));
+
+            var editingCount = activeWorkflows.Count(w =>
+                string.Equals(
+                    w.EditingStatus,
+                    "In Progress",
+                    StringComparison.OrdinalIgnoreCase));
+
+            var readyToDeliverCount = activeWorkflows.Count(w =>
+                string.Equals(
+                    w.EditingStatus,
+                    "Completed",
+                    StringComparison.OrdinalIgnoreCase)
+                &&
+                string.Equals(
+                    w.DeliveryStatus,
+                    "Ready",
+                    StringComparison.OrdinalIgnoreCase));
+
+            var deliveredCount = workflows.Count(w =>
+                string.Equals(
+                    w.DeliveryStatus,
+                    "Delivered",
+                    StringComparison.OrdinalIgnoreCase));
+
+            var activeJobsCount = activeWorkflows.Count;
+
+            var completedJobsCount = completedWorkflows.Count;
+
+
+            // -----------------------------------------
+            // SEARCH
+            // -----------------------------------------
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var normalizedSearch = search.Trim();
+
+                activeWorkflows = activeWorkflows
+                    .Where(w =>
+                        w.Booking.FullName.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        w.Booking.Email.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        w.Booking.ServiceType.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+
+                completedWorkflows = completedWorkflows
+                    .Where(w =>
+                        w.Booking.FullName.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        w.Booking.Email.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        w.Booking.ServiceType.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+
+            // -----------------------------------------
+            // STATUS FILTER
+            // -----------------------------------------
+
+            if (!string.IsNullOrWhiteSpace(statusFilter))
+            {
+                activeWorkflows = statusFilter switch
+                {
+                    "NeedsEditing" => activeWorkflows
+                        .Where(w =>
+                            string.Equals(
+                                w.EditingStatus,
+                                "Not Started",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "Editing" => activeWorkflows
+                        .Where(w =>
+                            string.Equals(
+                                w.EditingStatus,
+                                "In Progress",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "ReadyToDeliver" => activeWorkflows
+                        .Where(w =>
+                            string.Equals(
+                                w.EditingStatus,
+                                "Completed",
+                                StringComparison.OrdinalIgnoreCase)
+                            &&
+                            string.Equals(
+                                w.DeliveryStatus,
+                                "Ready",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "Delivered" => activeWorkflows
+                        .Where(w =>
+                            string.Equals(
+                                w.DeliveryStatus,
+                                "Delivered",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    _ => activeWorkflows
+                };
+            }
+
+
+            // -----------------------------------------
+            // VIEW MODEL
+            // -----------------------------------------
+
             var model = new WorkflowDashboardViewModel
             {
-                NeedsEditingCount = activeWorkflows.Count(w =>
-                    string.Equals(
-                        w.EditingStatus,
-                        "Not Started",
-                        StringComparison.OrdinalIgnoreCase)),
+                NeedsEditingCount = needsEditingCount,
 
-                EditingCount = activeWorkflows.Count(w =>
-                    string.Equals(
-                        w.EditingStatus,
-                        "In Progress",
-                        StringComparison.OrdinalIgnoreCase)),
+                EditingCount = editingCount,
 
-                ReadyToDeliverCount = activeWorkflows.Count(w =>
-                    string.Equals(
-                        w.EditingStatus,
-                        "Completed",
-                        StringComparison.OrdinalIgnoreCase)
-                    &&
-                    string.Equals(
-                        w.DeliveryStatus,
-                        "Ready",
-                        StringComparison.OrdinalIgnoreCase)),
+                ReadyToDeliverCount = readyToDeliverCount,
 
-                DeliveredCount = workflows.Count(w =>
-                    string.Equals(
-                        w.DeliveryStatus,
-                        "Delivered",
-                        StringComparison.OrdinalIgnoreCase)),
+                DeliveredCount = deliveredCount,
 
-                ActiveJobsCount = activeWorkflows.Count,
+                ActiveJobsCount = activeJobsCount,
 
-                CompletedJobsCount = completedWorkflows.Count,
+                CompletedJobsCount = completedJobsCount,
+
+                Search = search,
+
+                StatusFilter = statusFilter,
 
                 ActiveWorkflows = activeWorkflows,
 

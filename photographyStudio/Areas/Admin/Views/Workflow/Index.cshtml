@@ -16,6 +16,116 @@
     <partial name="_PageHeader"
              model="pageHeader" />
 
+    <!-- Workflow Filters -->
+    <div class="kxn-card mb-4">
+
+        <div class="kxn-card-body">
+
+            <form asp-area="Admin"
+                  asp-controller="Workflow"
+                  asp-action="Index"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-lg-6">
+
+                        <label for="search"
+                               class="kxn-form-label">
+                            Search
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text"
+                                   id="search"
+                                   name="search"
+                                   value="@Model.Search"
+                                   class="form-control"
+                                   placeholder="Search by client, email, or service" />
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <label for="statusFilter"
+                               class="kxn-form-label">
+                            Workflow Status
+                        </label>
+
+                        <select id="statusFilter"
+                                name="statusFilter"
+                                class="form-select">
+
+                            <option value="">
+                                All Active Jobs
+                            </option>
+
+                            <option value="NeedsEditing"
+                                    selected="@(Model.StatusFilter == "NeedsEditing")">
+                                Needs Editing
+                            </option>
+
+                            <option value="Editing"
+                                    selected="@(Model.StatusFilter == "Editing")">
+                                Editing
+                            </option>
+
+                            <option value="ReadyToDeliver"
+                                    selected="@(Model.StatusFilter == "ReadyToDeliver")">
+                                Ready to Deliver
+                            </option>
+
+                            <option value="Delivered"
+                                    selected="@(Model.StatusFilter == "Delivered")">
+                                Delivered
+                            </option>
+
+                        </select>
+
+                    </div>
+
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary flex-grow-1">
+
+                                <i class="bi bi-funnel me-1"></i>
+                                Apply
+
+                            </button>
+
+                            <a asp-area="Admin"
+                               asp-controller="Workflow"
+                               asp-action="Index"
+                               class="btn kxn-btn-outline">
+
+                                Clear
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
     <!-- Workflow Stats -->
     <div class="row g-4 mb-4">
 
@@ -262,16 +372,37 @@
             <div class="kxn-empty-state">
 
                 <div class="kxn-empty-icon">
-                    <i class="bi bi-check-circle"></i>
+                    <i class="bi bi-search"></i>
                 </div>
 
-                <h4 class="kxn-empty-title">
-                    No active jobs
-                </h4>
+                @if (!string.IsNullOrWhiteSpace(Model.Search) ||
+               !string.IsNullOrWhiteSpace(Model.StatusFilter))
+                {
+                    <h4 class="kxn-empty-title">
+                        No matching active jobs
+                    </h4>
 
-                <p class="kxn-empty-description">
-                    There are currently no completed sessions waiting on editing, payment, or delivery.
-                </p>
+                    <p class="kxn-empty-description">
+                        Try changing your search or workflow filter.
+                    </p>
+
+                    <a asp-area="Admin"
+                       asp-controller="Workflow"
+                       asp-action="Index"
+                       class="btn kxn-btn-outline mt-3">
+                        Clear Filters
+                    </a>
+                }
+                else
+                {
+                    <h4 class="kxn-empty-title">
+                        No active jobs
+                    </h4>
+
+                    <p class="kxn-empty-description">
+                        There are currently no completed sessions waiting on editing, payment, or delivery.
+                    </p>
+                }
 
             </div>
         }
