@@ -26,7 +26,9 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index(string? statusFilter)
+        public async Task<IActionResult> Index(
+            string? search,
+            string? statusFilter)
         {
             var invoices = await _context.Invoices
                 .Include(i => i.Booking)
@@ -34,18 +36,133 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
 
-            if (string.Equals(statusFilter, "Outstanding", StringComparison.OrdinalIgnoreCase))
+            // Overall totals before filtering
+            ViewBag.TotalOutstanding =
+                invoices.Sum(i => i.BalanceRemaining);
+
+            ViewBag.PaidThisMonth =
+                invoices
+                    .Where(i =>
+                        string.Equals(
+                            i.Status,
+                            "Paid",
+                            StringComparison.OrdinalIgnoreCase)
+                        &&
+                        i.UpdatedAt.HasValue
+                        &&
+                        i.UpdatedAt.Value.Month ==
+                            DateTime.UtcNow.Month
+                        &&
+                        i.UpdatedAt.Value.Year ==
+                            DateTime.UtcNow.Year)
+                    .Sum(i => i.AmountPaid);
+
+            ViewBag.PendingCount =
+                invoices.Count(i =>
+                    string.Equals(
+                        i.Status,
+                        "Pending",
+                        StringComparison.OrdinalIgnoreCase)
+                    ||
+                    string.Equals(
+                        i.Status,
+                        "Partially Paid",
+                        StringComparison.OrdinalIgnoreCase));
+
+            ViewBag.OverdueCount =
+                invoices.Count(i =>
+                    i.BalanceRemaining > 0 &&
+                    i.DueDate.Date < DateTime.Today &&
+                    !string.Equals(
+                        i.Status,
+                        "Cancelled",
+                        StringComparison.OrdinalIgnoreCase));
+
+
+            // Search
+            if (!string.IsNullOrWhiteSpace(search))
             {
+                var normalizedSearch = search.Trim();
+
                 invoices = invoices
                     .Where(i =>
-                        i.BalanceRemaining > 0 &&
-                        !string.Equals(
-                            i.Status,
-                            "Cancelled",
+                        i.InvoiceNumber.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        i.Booking.FullName.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        i.Booking.Email.Contains(
+                            normalizedSearch,
+                            StringComparison.OrdinalIgnoreCase)
+                        ||
+                        i.Booking.ServiceType.Contains(
+                            normalizedSearch,
                             StringComparison.OrdinalIgnoreCase))
                     .ToList();
             }
 
+
+            // Status / business-state filter
+            if (!string.IsNullOrWhiteSpace(statusFilter))
+            {
+                invoices = statusFilter switch
+                {
+                    "Outstanding" => invoices
+                        .Where(i =>
+                            i.BalanceRemaining > 0 &&
+                            !string.Equals(
+                                i.Status,
+                                "Cancelled",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "Paid" => invoices
+                        .Where(i =>
+                            string.Equals(
+                                i.Status,
+                                "Paid",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "Pending" => invoices
+                        .Where(i =>
+                            string.Equals(
+                                i.Status,
+                                "Pending",
+                                StringComparison.OrdinalIgnoreCase)
+                            ||
+                            string.Equals(
+                                i.Status,
+                                "Partially Paid",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "Overdue" => invoices
+                        .Where(i =>
+                            i.BalanceRemaining > 0 &&
+                            i.DueDate.Date < DateTime.Today &&
+                            !string.Equals(
+                                i.Status,
+                                "Cancelled",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    "Cancelled" => invoices
+                        .Where(i =>
+                            string.Equals(
+                                i.Status,
+                                "Cancelled",
+                                StringComparison.OrdinalIgnoreCase))
+                        .ToList(),
+
+                    _ => invoices
+                };
+            }
+
+            ViewBag.Search = search;
             ViewBag.StatusFilter = statusFilter;
 
             return View(invoices);

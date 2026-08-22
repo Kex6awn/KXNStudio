@@ -34,11 +34,55 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         }
 
         // List all bookings
-        public async Task<IActionResult> Index(string? statusFilter)
+        public async Task<IActionResult> Index(string? search, string? statusFilter)
         {
             var query = _context.Bookings.AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(statusFilter))
+
+            ViewBag.TotalBookings =
+                await _context.Bookings.CountAsync();
+
+            ViewBag.PendingBookings =
+                await _context.Bookings.CountAsync(b =>
+                    b.Status == BookingStatuses.Pending);
+
+            ViewBag.ConfirmedBookings =
+                await _context.Bookings.CountAsync(b =>
+                    b.Status == BookingStatuses.Confirmed);
+
+            ViewBag.CompletedBookings =
+                await _context.Bookings.CountAsync(b =>
+                    b.Status == BookingStatuses.Completed);
+
+            ViewBag.DeclinedBookings =
+                await _context.Bookings.CountAsync(b =>
+                    b.Status == BookingStatuses.Declined);
+
+            ViewBag.CancelledBookings =
+                await _context.Bookings.CountAsync(b =>
+                    b.Status == BookingStatuses.Cancelled);
+
+
+            // -----------------------------------------
+            // SEARCH
+            // -----------------------------------------
+
+            if (!string.IsNullOrWhiteSpace(search))
+            {
+                var normalizedSearch = search.Trim();
+
+                query = query.Where(b =>
+                    b.FullName.Contains(normalizedSearch) ||
+                    b.Email.Contains(normalizedSearch) ||
+                    b.ServiceType.Contains(normalizedSearch));
+            }
+
+            // -----------------------------------------
+            // STATUS FILTER
+            // -----------------------------------------
+
+            if (!string.IsNullOrWhiteSpace(statusFilter) &&
+                BookingStatuses.All.Contains(statusFilter))
             {
                 query = query.Where(b =>
                     b.Status == statusFilter);
@@ -47,7 +91,8 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             var bookings = await query
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
-
+            
+            ViewBag.Search = search;
             ViewBag.StatusFilter = statusFilter;
 
             return View(bookings);

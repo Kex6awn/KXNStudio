@@ -3,31 +3,12 @@
 @{
     ViewData["Title"] = "Bookings";
 
-    var totalBookings = Model.Count;
-
-    var pendingBookings = Model.Count(b =>
-        string.Equals(
-            b.Status,
-            "Pending",
-            StringComparison.OrdinalIgnoreCase));
-
-    var confirmedBookings = Model.Count(b =>
-        string.Equals(
-            b.Status,
-            "Confirmed",
-            StringComparison.OrdinalIgnoreCase));
-
-    var declinedBookings = Model.Count(b =>
-        string.Equals(
-            b.Status,
-            "Declined",
-            StringComparison.OrdinalIgnoreCase));
-
-    var cancelledBookings = Model.Count(b =>
-        string.Equals(
-            b.Status,
-            "Cancelled",
-            StringComparison.OrdinalIgnoreCase));
+    var totalBookings = (int)ViewBag.TotalBookings;
+    var pendingBookings = (int)ViewBag.PendingBookings;
+    var confirmedBookings = (int)ViewBag.ConfirmedBookings;
+    var completedBookings = (int)ViewBag.CompletedBookings;
+    var declinedBookings = (int)ViewBag.DeclinedBookings;
+    var cancelledBookings = (int)ViewBag.CancelledBookings;
 }
 
 <div class="container-fluid kxn-page">
@@ -56,19 +37,149 @@
 
     </div>
 
-    @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string))
+    <div class="kxn-card mb-4">
+
+    <div class="kxn-card-body">
+
+        <form asp-area="Admin"
+              asp-controller="Bookings"
+              asp-action="Index"
+              method="get">
+
+            <div class="row g-3 align-items-end">
+
+                <div class="col-lg-6">
+
+                    <label for="search"
+                           class="kxn-form-label">
+                        Search
+                    </label>
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            <i class="bi bi-search"></i>
+                        </span>
+
+                        <input type="text"
+                               id="search"
+                               name="search"
+                               value="@ViewBag.Search"
+                               class="form-control"
+                               placeholder="Search by client, email, or service" />
+
+                    </div>
+
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+
+                    <label for="statusFilter"
+                           class="kxn-form-label">
+                        Status
+                    </label>
+
+                    <select id="statusFilter"
+                            name="statusFilter"
+                            class="form-select">
+
+                        <option value="">All Statuses</option>
+
+                        <option value="Pending"
+                                selected="@(ViewBag.StatusFilter == "Pending" ? "selected" : null)">
+                            Pending
+                        </option>
+
+                        <option value="Confirmed"
+                                selected="@(ViewBag.StatusFilter == "Confirmed" ? "selected" : null)">
+                            Confirmed
+                        </option>
+
+                        <option value="Completed"
+                                selected="@(ViewBag.StatusFilter == "Completed" ? "selected" : null)">
+                            Completed
+                        </option>
+
+                        <option value="Declined"
+                                selected="@(ViewBag.StatusFilter == "Declined" ? "selected" : null)">
+                            Declined
+                        </option>
+
+                        <option value="Cancelled"
+                                selected="@(ViewBag.StatusFilter == "Cancelled" ? "selected" : null)">
+                            Cancelled
+                        </option>
+
+                    </select>
+
+                </div>
+
+                <div class="col-md-6 col-lg-3">
+
+                    <div class="d-flex gap-2">
+
+                        <button type="submit"
+                                class="btn btn-primary flex-grow-1">
+                            <i class="bi bi-funnel me-1"></i>
+                            Apply
+                        </button>
+
+                        <button type="button"
+                                class="btn kxn-btn-outline"
+                                onclick="window.location.replace('@Url.Action("Index", "Bookings", new { area = "Admin" })')">
+                            Clear
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string) ||
+        !string.IsNullOrWhiteSpace(ViewBag.Search as string))
     {
         <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
 
             <div>
-                Showing bookings with status:
-                <strong>@ViewBag.StatusFilter</strong>
+
+                @if (!string.IsNullOrWhiteSpace(ViewBag.Search as string) &&
+                    !string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string))
+                {
+                        <span>
+                            Showing results for
+                            <strong>"@ViewBag.Search"</strong>
+                            with status
+                            <strong>@ViewBag.StatusFilter</strong>
+                        </span>
+                }
+                else if (!string.IsNullOrWhiteSpace(ViewBag.Search as string))
+                {
+                        <span>
+                            Showing results for
+                            <strong>"@ViewBag.Search"</strong>
+                        </span>
+                }
+                else
+                {
+                        <span>
+                            Showing bookings with status:
+                            <strong>@ViewBag.StatusFilter</strong>
+                        </span>
+                }
+
             </div>
 
             <button type="button"
                     class="btn btn-sm kxn-btn-outline"
                     onclick="window.location.replace('@Url.Action("Index", "Bookings", new { area = "Admin" })')">
-                Clear Filter
+                Clear Filters
             </button>
 
         </div>
@@ -146,6 +257,19 @@
         <div class="col-md-6 col-xl">
 
             <partial name="_StatCard"
+                model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
+            {
+                Label = "Completed",
+                Value = completedBookings.ToString(),
+                ValueClass = "text-success",
+                IconClass = "bi bi-check2-circle"
+            }' />
+
+        </div>
+
+        <div class="col-md-6 col-xl">
+
+            <partial name="_StatCard"
                      model='new KxnPhotoStudio.Models.ViewModels.StatCardViewModel
              {
                  Label = "Declined",
@@ -181,22 +305,21 @@
                     <i class="bi bi-calendar-x"></i>
                 </div>
 
-                @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string))
+                @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string) ||
+                    !string.IsNullOrWhiteSpace(ViewBag.Search as string))
                 {
                     <h4 class="kxn-empty-title">
                         No matching bookings
                     </h4>
 
                     <p class="kxn-empty-description">
-                        There are no bookings with the
-                        <strong>@ViewBag.StatusFilter</strong>
-                        status.
+                        Try changing your search or status filter.
                     </p>
 
                     <button type="button"
                             class="btn btn-sm kxn-btn-outline"
                             onclick="window.location.replace('@Url.Action("Index", "Bookings", new { area = "Admin" })')">
-                        Clear Filter
+                        Clear Filters
                     </button>
                 }
                 else

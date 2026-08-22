@@ -3,23 +3,10 @@
 @{
     ViewData["Title"] = "Invoices";
 
-    var totalOutstanding = Model.Sum(i => i.BalanceRemaining);
-
-    var paidThisMonth = Model
-        .Where(i => i.Status == "Paid" &&
-                    i.UpdatedAt.HasValue &&
-                    i.UpdatedAt.Value.Month == DateTime.UtcNow.Month &&
-                    i.UpdatedAt.Value.Year == DateTime.UtcNow.Year)
-        .Sum(i => i.AmountPaid);
-
-    var pendingCount = Model.Count(i =>
-        i.Status == "Pending" ||
-        i.Status == "Partially Paid");
-
-    var overdueCount = Model.Count(i =>
-        i.BalanceRemaining > 0 &&
-        i.DueDate.Date < DateTime.Today &&
-        i.Status != "Cancelled");
+    var totalOutstanding = (decimal)ViewBag.TotalOutstanding;
+    var paidThisMonth = (decimal)ViewBag.PaidThisMonth;
+    var pendingCount = (int)ViewBag.PendingCount;
+    var overdueCount = (int)ViewBag.OverdueCount;
 }
 
 <div class="container-fluid kxn-page">
@@ -33,22 +20,149 @@
         </div>
     </div>
 
-    @if (string.Equals(
-    ViewBag.StatusFilter as string,
-    "Outstanding",
-    StringComparison.OrdinalIgnoreCase))
+    <div class="kxn-card mb-4">
+
+        <div class="kxn-card-body">
+
+            <form asp-area="Admin"
+                  asp-controller="Invoices"
+                  asp-action="Index"
+                  method="get">
+
+                <div class="row g-3 align-items-end">
+
+                    <div class="col-lg-6">
+
+                        <label for="search"
+                               class="kxn-form-label">
+                            Search
+                        </label>
+
+                        <div class="input-group">
+
+                            <span class="input-group-text">
+                                <i class="bi bi-search"></i>
+                            </span>
+
+                            <input type="text"
+                                   id="search"
+                                   name="search"
+                                   value="@ViewBag.Search"
+                                   class="form-control"
+                                   placeholder="Search invoice, client, email, or service" />
+
+                        </div>
+
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <label for="statusFilter"
+                               class="kxn-form-label">
+                            Status
+                        </label>
+
+                        <select id="statusFilter"
+                                name="statusFilter"
+                                class="form-select">
+
+                            <option value="">All Invoices</option>
+
+                            <option value="Outstanding"
+                                    selected="@(ViewBag.StatusFilter == "Outstanding" ? "selected" : null)">
+                                Outstanding
+                            </option>
+
+                            <option value="Paid"
+                                    selected="@(ViewBag.StatusFilter == "Paid" ? "selected" : null)">
+                                Paid
+                            </option>
+
+                            <option value="Pending"
+                                    selected="@(ViewBag.StatusFilter == "Pending" ? "selected" : null)">
+                                Pending / Partially Paid
+                            </option>
+
+                            <option value="Overdue"
+                                    selected="@(ViewBag.StatusFilter == "Overdue" ? "selected" : null)">
+                                Overdue
+                            </option>
+
+                            <option value="Cancelled"
+                                    selected="@(ViewBag.StatusFilter == "Cancelled" ? "selected" : null)">
+                                Cancelled
+                            </option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="col-md-6 col-lg-3">
+
+                        <div class="d-flex gap-2">
+
+                            <button type="submit"
+                                    class="btn btn-primary flex-grow-1">
+                                <i class="bi bi-funnel me-1"></i>
+                                Apply
+                            </button>
+
+                            <button type="button"
+                                    class="btn kxn-btn-outline"
+                                    onclick="window.location.replace('@Url.Action("Index", "Invoices", new { area = "Admin" })')">
+                                Clear
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </form>
+
+        </div>
+
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string) ||
+    !string.IsNullOrWhiteSpace(ViewBag.Search as string))
     {
         <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
 
             <div>
-                Showing:
-                <strong>Outstanding Invoices</strong>
+
+                @if (!string.IsNullOrWhiteSpace(ViewBag.Search as string) &&
+               !string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string))
+                {
+                    <span>
+                        Showing results for
+                        <strong>"@ViewBag.Search"</strong>
+                        with filter
+                        <strong>@ViewBag.StatusFilter</strong>
+                    </span>
+                }
+                else if (!string.IsNullOrWhiteSpace(ViewBag.Search as string))
+                {
+                    <span>
+                        Showing results for
+                        <strong>"@ViewBag.Search"</strong>
+                    </span>
+                }
+                else
+                {
+                    <span>
+                        Showing:
+                        <strong>@ViewBag.StatusFilter</strong>
+                    </span>
+                }
+
             </div>
 
             <button type="button"
                     class="btn btn-sm kxn-btn-outline"
                     onclick="window.location.replace('@Url.Action("Index", "Invoices", new { area = "Admin" })')">
-                Clear Filter
+                Clear Filters
             </button>
 
         </div>
@@ -118,23 +232,21 @@
                     <i class="bi bi-receipt"></i>
                 </div>
 
-                @if (string.Equals(
-               ViewBag.StatusFilter as string,
-               "Outstanding",
-               StringComparison.OrdinalIgnoreCase))
+                @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string) ||
+               !string.IsNullOrWhiteSpace(ViewBag.Search as string))
                 {
                     <h4 class="kxn-empty-title">
-                        No outstanding invoices
+                        No matching invoices
                     </h4>
 
                     <p class="kxn-empty-description">
-                        All current invoices have been paid or there are no invoices with a remaining balance.
+                        Try changing your search or invoice filter.
                     </p>
 
                     <button type="button"
-                            class="btn kxn-btn-outline mt-3"
+                            class="btn btn-sm kxn-btn-outline"
                             onclick="window.location.replace('@Url.Action("Index", "Invoices", new { area = "Admin" })')">
-                        Clear Filter
+                        Clear Filters
                     </button>
                 }
                 else
