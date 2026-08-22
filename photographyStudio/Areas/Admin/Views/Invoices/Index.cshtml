@@ -33,6 +33,27 @@
         </div>
     </div>
 
+    @if (string.Equals(
+    ViewBag.StatusFilter as string,
+    "Outstanding",
+    StringComparison.OrdinalIgnoreCase))
+    {
+        <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                Showing:
+                <strong>Outstanding Invoices</strong>
+            </div>
+
+            <button type="button"
+                    class="btn btn-sm kxn-btn-outline"
+                    onclick="window.location.replace('@Url.Action("Index", "Invoices", new { area = "Admin" })')">
+                Clear Filter
+            </button>
+
+        </div>
+    }
+
     <div class="row g-4 mb-4">
 
         <div class="col-md-6 col-xl-3">
@@ -90,21 +111,45 @@
     @if (!Model.Any())
     {
         <div class="kxn-card">
+
             <div class="kxn-empty-state">
 
                 <div class="kxn-empty-icon">
                     <i class="bi bi-receipt"></i>
                 </div>
 
-                <h4 class="kxn-empty-title">
-                    No invoices yet
-                </h4>
+                @if (string.Equals(
+               ViewBag.StatusFilter as string,
+               "Outstanding",
+               StringComparison.OrdinalIgnoreCase))
+                {
+                    <h4 class="kxn-empty-title">
+                        No outstanding invoices
+                    </h4>
 
-                <p class="kxn-empty-description">
-                    Invoices will appear here after you create them from confirmed bookings.
-                </p>
+                    <p class="kxn-empty-description">
+                        All current invoices have been paid or there are no invoices with a remaining balance.
+                    </p>
+
+                    <button type="button"
+                            class="btn kxn-btn-outline mt-3"
+                            onclick="window.location.replace('@Url.Action("Index", "Invoices", new { area = "Admin" })')">
+                        Clear Filter
+                    </button>
+                }
+                else
+                {
+                    <h4 class="kxn-empty-title">
+                        No invoices yet
+                    </h4>
+
+                    <p class="kxn-empty-description">
+                        Invoices will appear here after you create them from confirmed bookings.
+                    </p>
+                }
 
             </div>
+
         </div>
     }
     else

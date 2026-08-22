@@ -56,6 +56,24 @@
 
     </div>
 
+    @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string))
+    {
+        <div class="alert alert-info d-flex justify-content-between align-items-center mb-4">
+
+            <div>
+                Showing bookings with status:
+                <strong>@ViewBag.StatusFilter</strong>
+            </div>
+
+            <button type="button"
+                    class="btn btn-sm kxn-btn-outline"
+                    onclick="window.location.replace('@Url.Action("Index", "Bookings", new { area = "Admin" })')">
+                Clear Filter
+            </button>
+
+        </div>
+    }
+
     @if (TempData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show">
@@ -163,13 +181,34 @@
                     <i class="bi bi-calendar-x"></i>
                 </div>
 
-                <h4 class="kxn-empty-title">
-                    No bookings yet
-                </h4>
+                @if (!string.IsNullOrWhiteSpace(ViewBag.StatusFilter as string))
+                {
+                    <h4 class="kxn-empty-title">
+                        No matching bookings
+                    </h4>
 
-                <p class="kxn-empty-description">
-                    New booking requests will appear here when clients submit them.
-                </p>
+                    <p class="kxn-empty-description">
+                        There are no bookings with the
+                        <strong>@ViewBag.StatusFilter</strong>
+                        status.
+                    </p>
+
+                    <button type="button"
+                            class="btn btn-sm kxn-btn-outline"
+                            onclick="window.location.replace('@Url.Action("Index", "Bookings", new { area = "Admin" })')">
+                        Clear Filter
+                    </button>
+                }
+                else
+                {
+                    <h4 class="kxn-empty-title">
+                        No bookings yet
+                    </h4>
+
+                    <p class="kxn-empty-description">
+                        New booking requests will appear here when clients submit them.
+                    </p>
+                }
 
             </div>
 

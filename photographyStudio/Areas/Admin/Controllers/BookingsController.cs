@@ -34,11 +34,21 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         }
 
         // List all bookings
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? statusFilter)
         {
-            var bookings = await _context.Bookings
+            var query = _context.Bookings.AsQueryable();
+
+            if (!string.IsNullOrWhiteSpace(statusFilter))
+            {
+                query = query.Where(b =>
+                    b.Status == statusFilter);
+            }
+
+            var bookings = await query
                 .OrderByDescending(b => b.CreatedAt)
                 .ToListAsync();
+
+            ViewBag.StatusFilter = statusFilter;
 
             return View(bookings);
         }

@@ -26,13 +26,27 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
+        public async Task<IActionResult> Index(string? statusFilter)
         {
             var invoices = await _context.Invoices
                 .Include(i => i.Booking)
                 .ThenInclude(b => b.Client)
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
+
+            if (string.Equals(statusFilter, "Outstanding", StringComparison.OrdinalIgnoreCase))
+            {
+                invoices = invoices
+                    .Where(i =>
+                        i.BalanceRemaining > 0 &&
+                        !string.Equals(
+                            i.Status,
+                            "Cancelled",
+                            StringComparison.OrdinalIgnoreCase))
+                    .ToList();
+            }
+
+            ViewBag.StatusFilter = statusFilter;
 
             return View(invoices);
         }
@@ -64,10 +78,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                     });
             }
 
-            if (!string.Equals(
-                    booking.Status,
-                    "Confirmed",
-                    StringComparison.OrdinalIgnoreCase))
+            if (!string.Equals(booking.Status, "Confirmed", StringComparison.OrdinalIgnoreCase))
             {
                 TempData["WarningMessage"] =
                     "Only confirmed bookings can be invoiced.";

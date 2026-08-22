@@ -1,5 +1,6 @@
 ﻿@model KxnPhotoStudio.Models.ViewModels.AdminDashboardViewModel
 @using KxnPhotoStudio.Models.ViewModels
+@using KxnPhotoStudio.Models;
 
 @{
     ViewData["Title"] = "Admin Dashboard";
@@ -260,6 +261,249 @@
 
     </div>
 
+    <!-- Action Center -->
+    <div class="kxn-card mt-4">
+
+        <div class="kxn-card-header">
+
+            <div class="d-flex flex-wrap justify-content-between align-items-start gap-3">
+
+                <div>
+                    <h4 class="kxn-card-title">
+
+                        <i class="bi bi-bell me-2"></i>
+                        Needs Attention
+
+                    </h4>
+
+                    <p class="kxn-card-description">
+                        Tasks that may require action across your studio.
+                    </p>
+                </div>
+
+                @if (Model.TotalActionItems > 0)
+                {
+                    <span class="badge rounded-pill bg-danger fs-6">
+                        @Model.TotalActionItems
+                    </span>
+                }
+                else
+                {
+                    <span class="badge rounded-pill bg-success fs-6">
+                        All Clear
+                    </span>
+                }
+
+            </div>
+
+        </div>
+
+
+        <div class="kxn-card-body">
+
+            @if (Model.TotalActionItems > 0)
+            {
+                <div class="row g-3">
+
+                    <!-- Pending Bookings -->
+                    <div class="col-md-6 col-xl-3">
+
+                        <a asp-area="Admin"
+                           asp-controller="Bookings"
+                           asp-action="Index"
+                           asp-route-statusFilter="@BookingStatuses.Pending"
+                           class="action-center-link">
+
+                            <div class="action-center-item">
+
+                                <div class="action-center-icon bg-warning-subtle text-warning">
+
+                                    <i class="bi bi-hourglass-split"></i>
+
+                                </div>
+
+                                <div class="flex-grow-1">
+
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+
+                                        <h6 class="fw-bold mb-1">
+                                            Pending Bookings
+                                        </h6>
+
+                                        <span class="badge bg-warning text-dark">
+                                            @Model.PendingBookings
+                                        </span>
+
+                                    </div>
+
+                                    <p class="small text-muted mb-0">
+                                        Booking requests waiting for review.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- Outstanding Invoices -->
+                    <div class="col-md-6 col-xl-3">
+
+                        <a asp-area="Admin"
+                           asp-controller="Invoices"
+                           asp-action="Index"
+                           asp-route-statusFilter="Outstanding"
+                           class="action-center-link">
+
+                            <div class="action-center-item">
+
+                                <div class="action-center-icon bg-danger-subtle text-danger">
+
+                                    <i class="bi bi-cash-stack"></i>
+
+                                </div>
+
+                                <div class="flex-grow-1">
+
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+
+                                        <h6 class="fw-bold mb-1">
+                                            Outstanding Invoices
+                                        </h6>
+
+                                        <span class="badge bg-danger">
+                                            @Model.OutstandingInvoicesCount
+                                        </span>
+
+                                    </div>
+
+                                    <p class="small text-muted mb-0">
+                                        Invoices that still have a balance.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- Needs Editing -->
+                    <div class="col-md-6 col-xl-3">
+
+                        <a asp-area="Admin"
+                           asp-controller="Workflow"
+                           asp-action="Index"
+                           asp-route-statusFilter="NeedsEditing"
+                           class="action-center-link">
+
+                            <div class="action-center-item">
+
+                                <div class="action-center-icon bg-primary-subtle text-primary">
+
+                                    <i class="bi bi-pencil-square"></i>
+
+                                </div>
+
+                                <div class="flex-grow-1">
+
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+
+                                        <h6 class="fw-bold mb-1">
+                                            Needs Editing
+                                        </h6>
+
+                                        <span class="badge bg-primary">
+                                            @Model.NeedsEditingCount
+                                        </span>
+
+                                    </div>
+
+                                    <p class="small text-muted mb-0">
+                                        Completed sessions waiting for editing.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+
+                    <!-- Ready to Deliver -->
+                    <div class="col-md-6 col-xl-3">
+
+                        <a asp-area="Admin"
+                           asp-controller="Workflow"
+                           asp-action="Index"
+                           asp-route-statusFilter="ReadyToDeliver"
+                           class="action-center-link">
+
+                            <div class="action-center-item">
+
+                                <div class="action-center-icon bg-success-subtle text-success">
+
+                                    <i class="bi bi-box-seam"></i>
+
+                                </div>
+
+                                <div class="flex-grow-1">
+
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+
+                                        <h6 class="fw-bold mb-1">
+                                            Ready to Deliver
+                                        </h6>
+
+                                        <span class="badge bg-success">
+                                            @Model.ReadyToDeliverCount
+                                        </span>
+
+                                    </div>
+
+                                    <p class="small text-muted mb-0">
+                                        Finished galleries ready for the client.
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+                        </a>
+
+                    </div>
+
+                </div>
+            }
+            else
+            {
+                <div class="kxn-empty-state py-4">
+
+                    <div class="kxn-empty-icon">
+                        <i class="bi bi-check-circle"></i>
+                    </div>
+
+                    <h5 class="kxn-empty-title">
+                        You're all caught up
+                    </h5>
+
+                    <p class="kxn-empty-description">
+                        There are currently no studio tasks requiring attention.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
 
     <!-- Quick Actions -->
     <div class="kxn-card quick-actions-card mt-4">
@@ -839,6 +1083,7 @@
             border-top: 5px solid #212529 !important;
         }
 
+        /* Dashboard Action CSS */
 
         .quick-action-link {
             color: inherit;
@@ -878,6 +1123,43 @@
             color: #212529;
         }
 
+        .action-center-link {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .action-center-item {
+            height: 100%;
+            min-height: 115px;
+            padding: 18px;
+            border: 1px solid #e9ecef;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+
+            .action-center-item:hover {
+                transform: translateY(-3px);
+                border-color: #ced4da;
+                box-shadow: 0 0.65rem 1.25rem rgba(0, 0, 0, 0.08);
+            }
+
+        .action-center-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 13px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            font-size: 1.35rem;
+        }
+
+        .action-center-item h6 {
+            color: #212529;
+        }
     </style>
 
 }
