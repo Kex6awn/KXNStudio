@@ -24,6 +24,36 @@
     <partial name="_PageHeader"
              model="pageHeader" />
 
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show mb-4">
+
+            @TempData["SuccessMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
+
+    @if (TempData["WarningMessage"] != null)
+    {
+        <div class="alert alert-warning alert-dismissible fade show mb-4">
+
+            @TempData["WarningMessage"]
+
+            <button type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Close">
+            </button>
+
+        </div>
+    }
+
 
     <!-- Actions -->
     <div class="d-flex flex-wrap justify-content-end gap-2 mb-4">
@@ -724,6 +754,71 @@
 
                                 </div>
                             }
+
+                            <hr />
+
+                            <div class="d-flex flex-wrap gap-2">
+
+                                @if (string.Equals(
+                               booking.SessionWorkflow.EditingStatus,
+                               "Completed",
+                               StringComparison.OrdinalIgnoreCase)
+                               &&
+                               string.Equals(
+                               booking.SessionWorkflow.DeliveryStatus,
+                               "Ready",
+                               StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <form asp-area="Admin"
+                                          asp-controller="Bookings"
+                                          asp-action="SendGalleryReadyEmail"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="bookingId"
+                                               value="@booking.BookingId" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-primary">
+
+                                            <i class="bi bi-envelope me-1"></i>
+                                            Send Gallery Ready Email
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                                @if (string.Equals(
+                               booking.SessionWorkflow.DeliveryStatus,
+                               "Delivered",
+                               StringComparison.OrdinalIgnoreCase))
+                                {
+                                    <form asp-area="Admin"
+                                          asp-controller="Bookings"
+                                          asp-action="SendGalleryDeliveredEmail"
+                                          method="post">
+
+                                        @Html.AntiForgeryToken()
+
+                                        <input type="hidden"
+                                               name="bookingId"
+                                               value="@booking.BookingId" />
+
+                                        <button type="submit"
+                                                class="btn btn-sm btn-success">
+
+                                            <i class="bi bi-send-check me-1"></i>
+                                            Send Delivery Email
+
+                                        </button>
+
+                                    </form>
+                                }
+
+                            </div>
                         }
                         else
                         {

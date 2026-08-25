@@ -18,19 +18,22 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         private readonly IBookingStatusService _bookingStatusService;
         private readonly ISessionWorkflowService _sessionWorkflowService;
         private readonly IJobCompletionService _jobCompletionService;
+        private readonly IWorkflowNotificationService _workflowNotificationService;
 
         public BookingsController(
             AppDbContext context,
             IEmailService emailService,
             IBookingStatusService bookingStatusService,
             ISessionWorkflowService sessionWorkflowService,
-            IJobCompletionService jobCompletionService)
+            IJobCompletionService jobCompletionService,
+            IWorkflowNotificationService workflowNotificationService)
         {
             _context = context;
             _emailService = emailService;
             _bookingStatusService = bookingStatusService;
             _sessionWorkflowService = sessionWorkflowService;
             _jobCompletionService = jobCompletionService;
+            _workflowNotificationService = workflowNotificationService;
         }
 
         // List all bookings
@@ -627,6 +630,63 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
                 return View(model);
             }
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendGalleryReadyEmail(int bookingId)
+        {
+            try
+            {
+                await _workflowNotificationService
+                    .SendGalleryReadyEmailAsync(bookingId);
+
+                TempData["SuccessMessage"] =
+                    "Gallery-ready email sent successfully.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["WarningMessage"] =
+                    ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["WarningMessage"] =
+                    "The gallery-ready email could not be sent.";
+            }
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = bookingId });
+        }
+
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SendGalleryDeliveredEmail(int bookingId)
+        {
+            try
+            {
+                await _workflowNotificationService
+                    .SendGalleryDeliveredEmailAsync(bookingId);
+
+                TempData["SuccessMessage"] =
+                    "Gallery-delivery email sent successfully.";
+            }
+            catch (InvalidOperationException ex)
+            {
+                TempData["WarningMessage"] =
+                    ex.Message;
+            }
+            catch (Exception)
+            {
+                TempData["WarningMessage"] =
+                    "The gallery-delivery email could not be sent.";
+            }
+
+            return RedirectToAction(
+                nameof(Details),
+                new { id = bookingId });
         }
     }
 }
