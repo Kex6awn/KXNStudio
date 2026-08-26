@@ -115,10 +115,16 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
 
             var jobCompletion = await _jobCompletionService.GetJobCompletionAsync(booking.BookingId);
 
+            var notifications = await _context.ClientNotifications
+                    .Where(n => n.BookingId == booking.BookingId)
+                    .OrderByDescending(n => n.SentAt)
+                    .ToListAsync();
+
             var model = new BookingDetailsViewModel
             {
                 Booking = booking,
-                JobCompletion = jobCompletion
+                JobCompletion = jobCompletion,
+                Notifications = notifications
             };
 
             return View(model);

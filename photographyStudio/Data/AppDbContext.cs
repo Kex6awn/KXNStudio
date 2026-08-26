@@ -24,6 +24,8 @@ namespace KxnPhotoStudio.Data
 
         public DbSet<Payment> Payments => Set<Payment>();
 
+        public DbSet<ClientNotification> ClientNotifications { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

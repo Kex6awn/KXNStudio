@@ -1,4 +1,5 @@
 ﻿using KxnPhotoStudio.Data;
+using KxnPhotoStudio.Models;
 using KxnPhotoStudio.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
 
@@ -71,6 +72,18 @@ namespace KxnPhotoStudio.Services.Implementations
                 booking.Email,
                 subject,
                 body);
+
+            _context.ClientNotifications.Add(
+                new ClientNotification
+                {
+                    BookingId = booking.BookingId,
+                    RecipientEmail = booking.Email,
+                    NotificationType = "Gallery Ready",
+                    Subject = subject,
+                    SentAt = DateTime.UtcNow
+                });
+
+            await _context.SaveChangesAsync();
         }
 
         public async Task SendGalleryDeliveredEmailAsync(int bookingId)
@@ -120,6 +133,18 @@ namespace KxnPhotoStudio.Services.Implementations
                 booking.Email,
                 subject,
                 body);
+
+            _context.ClientNotifications.Add(
+                new ClientNotification
+                {
+                    BookingId = booking.BookingId,
+                    RecipientEmail = booking.Email,
+                    NotificationType = "Gallery Delivered",
+                    Subject = subject,
+                    SentAt = DateTime.UtcNow
+                });
+
+            await _context.SaveChangesAsync();
         }
 
         private string BuildEmailTemplate(
