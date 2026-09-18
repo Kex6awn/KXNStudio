@@ -35,7 +35,7 @@ namespace KxnPhotoStudio.Services.Implementations
                 FormattedTime = DateTime.Today
                     .Add(booking.StartTime)
                     .ToString("h:mm tt"),
-                DurationHours = booking.DurationHours,
+                DurationHours = booking.DurationHours.Value,
                 Status = booking.Status,
                 MessageText = string.IsNullOrWhiteSpace(booking.Message)
                     ? "No additional message was provided."

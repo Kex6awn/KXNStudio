@@ -63,6 +63,12 @@ namespace KxnPhotoStudio.Data
                 .HasForeignKey<SessionWorkflow>(sw => sw.BookingId)
                 .OnDelete(DeleteBehavior.Restrict);
 
+            modelBuilder.Entity<ClientNotification>()
+                .HasOne(n => n.Booking)
+                .WithMany()
+                .HasForeignKey(n => n.BookingId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             // seed starter categories
 
             modelBuilder.Entity<Category>().HasData(

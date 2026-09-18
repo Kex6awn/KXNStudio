@@ -72,6 +72,14 @@ namespace KxnPhotoStudio.Services.Implementations
                     "Deposit cannot be negative.");
             }
 
+            var calculatedTotal = subtotal + tax - discount;
+
+            if (calculatedTotal < 0)
+            {
+                throw new InvalidOperationException(
+                    "The discount cannot exceed the invoice subtotal plus tax.");
+            }
+
             if (dueDate.Date < DateTime.Today)
             {
                 throw new InvalidOperationException(

@@ -56,14 +56,17 @@ namespace KxnPhotoStudio.Services.Implementations
         }
 
         public async Task UpdateWorkflowAsync(
-                int workflowId,
-                string editingStatus,
-                string deliveryStatus,
-                string? galleryUrl,
-                string? deliveryNotes)
-            {
+            int workflowId,
+            int bookingId,
+            string editingStatus,
+            string deliveryStatus,
+            string? galleryUrl,
+            string? deliveryNotes)
+        {
             var workflow = await _context.SessionWorkflows
-                .FirstOrDefaultAsync(sw => sw.SessionWorkflowId == workflowId);
+                .FirstOrDefaultAsync(sw =>
+                    sw.SessionWorkflowId == workflowId &&
+                    sw.BookingId == bookingId);
 
             if (workflow == null)
             {

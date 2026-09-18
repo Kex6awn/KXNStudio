@@ -7,6 +7,7 @@ namespace KxnPhotoStudio.Services.Interfaces
         Task<SessionWorkflow> GetOrCreateForBookingAsync(int bookingId);
         Task UpdateWorkflowAsync(
             int workflowId,
+            int bookingId,
             string editingStatus,
             string deliveryStatus,
             string? galleryUrl,

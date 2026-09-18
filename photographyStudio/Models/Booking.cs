@@ -14,19 +14,24 @@ namespace KxnPhotoStudio.Models
 
         public SessionWorkflow? SessionWorkflow { get; set; }
 
-        [Required]
+        [Required(ErrorMessage = "Full name is required.")]
         [StringLength(100)]
+        [RegularExpression(
+            @"^[A-Za-z]+(?:[ '-][A-Za-z]+)*$",
+            ErrorMessage = "Please enter a valid full name.")]
         public string FullName { get; set; } = string.Empty;
 
-        [Required]
-        [EmailAddress]
+        [Required(ErrorMessage = "Email is required.")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address.")]
         public string Email { get; set; } = string.Empty;
 
-        [Phone]
+        [Display(Name = "Phone Number")]
+        [Phone(ErrorMessage = "Please enter a valid phone number.")]
         [StringLength(20)]
         public string? PhoneNumber { get; set; }
 
-        [Required]
+        [Display(Name = "Service Type")]
+        [Required(ErrorMessage = "Please select a service.")]
         [StringLength(100)]
         public string ServiceType { get; set; } = string.Empty;
 
@@ -36,8 +41,9 @@ namespace KxnPhotoStudio.Models
         [Required]
         public TimeSpan StartTime { get; set; }
 
-        [Range(1, 12)]
-        public int DurationHours { get; set; }
+        [Required(ErrorMessage = "Session duration is required.")]
+        [Range(1, 12, ErrorMessage = "Session duration must be between 1 and 12 hours.")]
+        public int? DurationHours { get; set; }
 
         [StringLength(1000)]
         public string? Message { get; set; }

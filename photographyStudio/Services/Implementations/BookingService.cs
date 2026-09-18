@@ -32,23 +32,31 @@ namespace KxnPhotoStudio.Services.Implementations
                     "Please select a future date.");
             }
 
-            if (booking.StartTime < businessStart ||
-                booking.StartTime >= businessEnd)
+            if (booking.EventDate.Date == DateTime.Today && booking.StartTime <= DateTime.Now.TimeOfDay)
+            {
+                return Fail(
+                    "StartTime",
+                    "Please select a time that has not already passed.");
+            }
+
+            if (booking.StartTime < businessStart || booking.StartTime >= businessEnd)
             {
                 return Fail(
                     "StartTime",
                     "Bookings must be between 9:00 AM and 6:00 PM.");
             }
 
-            if (booking.DurationHours < 1)
+            if (booking.DurationHours == null ||
+                booking.DurationHours < 1 ||
+                booking.DurationHours > 12)
             {
                 return Fail(
                     "DurationHours",
-                    "Please select a valid duration.");
+                    "Session duration must be between 1 and 12 hours.");
             }
 
             var requestedEndTime = booking.StartTime.Add(
-                TimeSpan.FromHours(booking.DurationHours));
+                TimeSpan.FromHours(booking.DurationHours.Value));
 
             if (requestedEndTime > businessEnd)
             {
@@ -69,7 +77,7 @@ namespace KxnPhotoStudio.Services.Implementations
                 var existingStart = existing.StartTime;
 
                 var existingEnd = existing.StartTime.Add(
-                    TimeSpan.FromHours(existing.DurationHours));
+                    TimeSpan.FromHours(existing.DurationHours.Value));
 
                 return booking.StartTime < existingEnd &&
                        requestedEndTime > existingStart;

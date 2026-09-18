@@ -74,7 +74,7 @@ namespace KxnPhotoStudio.Controllers
 
                         var existingEnd = existing.StartTime.Add(
                             TimeSpan.FromHours(
-                                existing.DurationHours));
+                                existing.DurationHours.Value));
 
                         return slot < existingEnd &&
                                requestedEnd > existingStart;
@@ -123,6 +123,11 @@ namespace KxnPhotoStudio.Controllers
                  slot < businessEnd;
                  slot = slot.Add(TimeSpan.FromHours(1)))
             {
+                if (eventDate.Date == DateTime.Today && slot <= DateTime.Now.TimeOfDay)
+                {
+                    continue;
+                }
+
                 var requestedEnd = slot.Add(
                     TimeSpan.FromHours(durationHours));
 
@@ -137,7 +142,7 @@ namespace KxnPhotoStudio.Controllers
 
                     var existingEnd = existing.StartTime.Add(
                         TimeSpan.FromHours(
-                            existing.DurationHours));
+                            existing.DurationHours.Value));
 
                     return slot < existingEnd &&
                            requestedEnd > existingStart;
@@ -161,7 +166,9 @@ namespace KxnPhotoStudio.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Booking booking)
+        public async Task<IActionResult> Create(
+        [Bind("FullName,Email,PhoneNumber,ServiceType,EventDate,StartTime,DurationHours,Message")]
+            Booking booking)
         {
             if (!ModelState.IsValid)
             {

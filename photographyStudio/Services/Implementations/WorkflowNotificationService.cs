@@ -57,8 +57,15 @@ namespace KxnPhotoStudio.Services.Implementations
                     "The gallery must be marked Ready before sending this email.");
             }
 
-            var subject =
-                "Your Photos Are Ready - KXN Photo Studio";
+            var alreadySent = await _context.ClientNotifications
+                                .AnyAsync(n => n.BookingId == booking.BookingId && n.NotificationType == "Gallery Ready");
+
+            if (alreadySent)
+            {
+                throw new InvalidOperationException("A Gallery Ready email has already been sent to this client.");
+            }
+
+            var subject = "Your Photos Are Ready - KXN Photo Studio";
 
             var body = BuildEmailTemplate(
                 booking.FullName,
@@ -95,16 +102,14 @@ namespace KxnPhotoStudio.Services.Implementations
 
             if (booking == null)
             {
-                throw new InvalidOperationException(
-                    "The booking could not be found.");
+                throw new InvalidOperationException("The booking could not be found.");
             }
 
             var workflow = booking.SessionWorkflow;
 
             if (workflow == null)
             {
-                throw new InvalidOperationException(
-                    "The session workflow could not be found.");
+                throw new InvalidOperationException("The session workflow could not be found.");
             }
 
             if (!string.Equals(
@@ -116,8 +121,15 @@ namespace KxnPhotoStudio.Services.Implementations
                     "The gallery must be marked Delivered before sending this email.");
             }
 
-            var subject =
-                "Your Photo Gallery Has Been Delivered - KXN Photo Studio";
+            var alreadySent = await _context.ClientNotifications
+                            .AnyAsync(n => n.BookingId == booking.BookingId && n.NotificationType == "Gallery Delivered");
+
+            if (alreadySent)
+            {
+                throw new InvalidOperationException("A Gallery Delivered email has already been sent to this client.");
+            }
+
+            var subject = "Your Photo Gallery Has Been Delivered - KXN Photo Studio";
 
             var body = BuildEmailTemplate(
                 booking.FullName,

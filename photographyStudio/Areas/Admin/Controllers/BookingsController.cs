@@ -180,7 +180,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                                                     .Select(b => new {id = b.BookingId, title = b.ServiceType + " - " + b.FullName,
                                                     start = b.EventDate.Add(b.StartTime).ToString("yyyy-MM-ddTHH:mm:ss"),
                                                     
-                                                    end = b.EventDate.Add(b.StartTime).AddHours(b.DurationHours).ToString("yyyy-MM-ddTHH:mm:ss"),
+                                                    end = b.EventDate.Add(b.StartTime).AddHours(b.DurationHours.Value).ToString("yyyy-MM-ddTHH:mm:ss"),
                                                     
                                                     status = b.Status,
                                                     
@@ -548,13 +548,35 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            var booking = await _context.Bookings.FindAsync(id);
+            var booking = await _context.Bookings
+                .Include(b => b.Invoice)
+                .Include(b => b.SessionWorkflow)
+                .FirstOrDefaultAsync(b => b.BookingId == id);
 
-            if (booking != null)
+            if (booking == null)
             {
-                _context.Bookings.Remove(booking);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
+
+            var hasNotifications =
+                await _context.ClientNotifications
+                    .AnyAsync(n => n.BookingId == id);
+
+            if (booking.Invoice != null ||
+                booking.SessionWorkflow != null ||
+                hasNotifications)
+            {
+                TempData["Warning"] =
+                    "This booking cannot be deleted because it has related business records. " +
+                    "Cancel or decline the booking instead.";
+
+                return RedirectToAction(nameof(Details), new { id });
+            }
+
+            _context.Bookings.Remove(booking);
+            await _context.SaveChangesAsync();
+
+            TempData["Success"] = "Booking deleted successfully.";
 
             return RedirectToAction(nameof(Index));
         }
@@ -616,6 +638,7 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             {
                 await _sessionWorkflowService.UpdateWorkflowAsync(
                     model.SessionWorkflowId,
+                    model.BookingId,
                     model.EditingStatus,
                     model.DeliveryStatus,
                     model.GalleryUrl,

@@ -14,7 +14,15 @@ namespace KxnPhotoStudio
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
-            builder.Services.AddControllersWithViews();
+            builder.Services.AddControllersWithViews(options =>
+            {
+                options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(
+                    _ => "Please select an event date.");
+
+                options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor(
+                    (value, fieldName) => $"Please enter a valid value for {fieldName}.");
+            });
+
             builder.Services.AddRazorPages();
 
             // Dependency injection Kexhawn
