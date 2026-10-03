@@ -41,27 +41,44 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(PhotoUploadViewModel model)
         {
-            if (model.ImageFile == null)
+            var imageFile = model.ImageFile;
+
+            if (imageFile == null)
             {
-                ModelState.AddModelError("ImageFile", "Please select an image.");
+                ModelState.AddModelError(
+                    "ImageFile",
+                    "Please select an image.");
+
+                ViewBag.Categories = new SelectList(
+                    _context.Categories,
+                    "CategoryId",
+                    "Name",
+                    model.CategoryId);
+
+                return View(model);
             }
 
             if (!ModelState.IsValid)
             {
-                ViewBag.Categories = new SelectList(_context.Categories, "CategoryId", "Name", model.CategoryId);
+                ViewBag.Categories = new SelectList(
+                    _context.Categories,
+                    "CategoryId",
+                    "Name",
+                    model.CategoryId);
+
                 return View(model);
             }
 
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
             Directory.CreateDirectory(uploadsFolder);
 
-            var safeFileName = Path.GetFileName(model.ImageFile.FileName);
+            var safeFileName = Path.GetFileName(imageFile.FileName);
             var uniqueFileName = $"{Guid.NewGuid()}_{safeFileName}";
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var stream = new FileStream(filePath, FileMode.Create))
             {
-                await model.ImageFile.CopyToAsync(stream);
+                await imageFile.CopyToAsync(stream);
             }
 
             var photo = new Photo
@@ -215,7 +232,24 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
             var uploadsFolder = Path.Combine(_env.WebRootPath, "uploads");
             Directory.CreateDirectory(uploadsFolder);
 
-            foreach (var imageFile in model.ImageFiles)
+            var imageFiles = model.ImageFiles;
+
+            if (imageFiles == null || !imageFiles.Any())
+            {
+                ModelState.AddModelError(
+                    "ImageFiles",
+                    "Please select at least one image.");
+
+                ViewBag.Categories = new SelectList(
+                    _context.Categories,
+                    "CategoryId",
+                    "Name",
+                    model.CategoryId);
+
+                return View(model);
+            }
+
+            foreach (var imageFile in imageFiles)
             {
                 if (imageFile.Length <= 0) continue;
 

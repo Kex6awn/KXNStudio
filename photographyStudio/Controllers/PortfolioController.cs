@@ -4,6 +4,7 @@ using KxnPhotoStudio.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authorization;
 
 namespace KxnPhotoStudio.Controllers
 {
@@ -40,34 +41,63 @@ namespace KxnPhotoStudio.Controllers
         }
 
         // GET: Upload
-        public async Task<IActionResult> Upload()
+        [Authorize]
+        public IActionResult Upload()
         {
-            ViewBag.Categories = new SelectList(_context.Categories, "CategoryId", "Name");
+            ViewBag.Categories = new SelectList(
+                _context.Categories,
+                "CategoryId",
+                "Name");
+
             return View();
         }
 
         // POST: Upload
         [HttpPost]
+        [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Upload(PhotoUploadViewModel model)
         {
-            if (!ModelState.IsValid)
+            var imageFile = model.ImageFile;
+
+            if (imageFile == null)
             {
-                ViewBag.Categories = new SelectList(_context.Categories, "CategoryId", "Name");
+                ModelState.AddModelError(
+                    "ImageFile",
+                    "Please select an image.");
+
+                ViewBag.Categories = new SelectList(
+                    _context.Categories,
+                    "CategoryId",
+                    "Name");
+
                 return View(model);
             }
 
-            var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/uploads");
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = new SelectList(
+                    _context.Categories,
+                    "CategoryId",
+                    "Name");
+
+                return View(model);
+            }
+
+            var uploadsFolder = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "wwwroot/uploads");
 
             if (!Directory.Exists(uploadsFolder))
                 Directory.CreateDirectory(uploadsFolder);
 
-            var uniqueFileName = Guid.NewGuid().ToString() + "_" + model.ImageFile.FileName;
+            var uniqueFileName =
+                Guid.NewGuid().ToString() + "_" + imageFile.FileName;
             var filePath = Path.Combine(uploadsFolder, uniqueFileName);
 
             using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                await model.ImageFile.CopyToAsync(fileStream);
+                await imageFile.CopyToAsync(fileStream);
             }
 
             var photo = new Photo

@@ -97,31 +97,32 @@ namespace KxnPhotoStudio
                 var adminEmail = builder.Configuration["AdminSettings:Email"];
                 var adminPassword = builder.Configuration["AdminSettings:Password"];
 
-                if (string.IsNullOrWhiteSpace(adminEmail) ||
-                    string.IsNullOrWhiteSpace(adminPassword))
+                if (!string.IsNullOrWhiteSpace(adminEmail) &&
+                    !string.IsNullOrWhiteSpace(adminPassword))
                 {
-                    throw new InvalidOperationException(
-                        "Admin credentials are missing from User Secrets.");
-                }
+                    var existingUser =
+                        await userManager.FindByEmailAsync(adminEmail);
 
-                var existingUser = await userManager.FindByEmailAsync(adminEmail);
-
-                if (existingUser == null)
-                {
-                    var adminUser = new IdentityUser
+                    if (existingUser == null)
                     {
-                        UserName = adminEmail,
-                        Email = adminEmail,
-                        EmailConfirmed = true
-                    };
-
-                    var result = await userManager.CreateAsync(adminUser, adminPassword);
-
-                    if (!result.Succeeded)
-                    {
-                        foreach (var error in result.Errors)
+                        var adminUser = new IdentityUser
                         {
-                            Console.WriteLine(error.Description);
+                            UserName = adminEmail,
+                            Email = adminEmail,
+                            EmailConfirmed = true
+                        };
+
+                        var result =
+                            await userManager.CreateAsync(
+                                adminUser,
+                                adminPassword);
+
+                        if (!result.Succeeded)
+                        {
+                            foreach (var error in result.Errors)
+                            {
+                                Console.WriteLine(error.Description);
+                            }
                         }
                     }
                 }

@@ -22,6 +22,13 @@ namespace KxnPhotoStudio.Services.Implementations
 
         public async Task SendNewBookingEmailsAsync(Booking booking)
         {
+
+            if (!booking.DurationHours.HasValue)
+            {
+                throw new InvalidOperationException(
+                    "Cannot send a booking email because the session duration is missing.");
+            }
+
             var model = new BookingEmailViewModel
             {
                 FullName = booking.FullName,

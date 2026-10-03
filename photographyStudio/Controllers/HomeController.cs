@@ -1,6 +1,8 @@
 ﻿using KxnPhotoStudio.Data;
+using KxnPhotoStudio.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Diagnostics;
 
 namespace KxnPhotoStudio.Controllers
 {
@@ -22,6 +24,19 @@ namespace KxnPhotoStudio.Controllers
                 .ToListAsync();
 
             return View(featuredPhotos);
+        }
+
+        [ResponseCache(
+            Duration = 0,
+            Location = ResponseCacheLocation.None,
+            NoStore = true)]
+        public IActionResult Error()
+        {
+            return View(new ErrorViewModel
+            {
+                RequestId = Activity.Current?.Id
+                    ?? HttpContext.TraceIdentifier
+            });
         }
     }
 }

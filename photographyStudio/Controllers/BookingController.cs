@@ -70,6 +70,11 @@ namespace KxnPhotoStudio.Controllers
 
                     var overlaps = dayBookings.Any(existing =>
                     {
+                        if (!existing.DurationHours.HasValue)
+                        {
+                            return false;
+                        }
+
                         var existingStart = existing.StartTime;
 
                         var existingEnd = existing.StartTime.Add(
@@ -138,6 +143,11 @@ namespace KxnPhotoStudio.Controllers
 
                 var overlaps = existingBookings.Any(existing =>
                 {
+                    if (!existing.DurationHours.HasValue)
+                    {
+                        return false;
+                    }
+
                     var existingStart = existing.StartTime;
 
                     var existingEnd = existing.StartTime.Add(

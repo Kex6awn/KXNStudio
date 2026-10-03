@@ -1,0 +1,35 @@
+﻿@model KxnPhotoStudio.Models.ErrorViewModel
+
+@{
+    ViewData["Title"] = "Something Went Wrong";
+}
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-7 text-center">
+
+            <h1 class="mb-3">Something went wrong</h1>
+
+            <p class="text-muted mb-4">
+                We couldn't complete your request right now.
+                Please try again later.
+            </p>
+
+            <a asp-controller="Home"
+               asp-action="Index"
+               class="btn btn-dark">
+                Return Home
+            </a>
+
+            @if (Model?.ShowRequestId == true)
+            {
+                <div class="mt-4">
+                    <small class="text-muted">
+                        Request ID: @Model.RequestId
+                    </small>
+                </div>
+            }
+
+        </div>
+    </div>
+</div>

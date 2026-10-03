@@ -74,6 +74,11 @@ namespace KxnPhotoStudio.Services.Implementations
 
             var overlaps = existingBookings.Any(existing =>
             {
+                if (!existing.DurationHours.HasValue)
+                {
+                    return false;
+                }
+
                 var existingStart = existing.StartTime;
 
                 var existingEnd = existing.StartTime.Add(
