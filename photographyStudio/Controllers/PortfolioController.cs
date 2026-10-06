@@ -4,7 +4,8 @@ using KxnPhotoStudio.Models.ViewModels;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Authorization;
+//using Microsoft.AspNetCore.Authorization;
+//using KxnPhotoStudio.Services;
 
 namespace KxnPhotoStudio.Controllers
 {
@@ -41,77 +42,96 @@ namespace KxnPhotoStudio.Controllers
         }
 
         // GET: Upload
-        [Authorize]
-        public IActionResult Upload()
-        {
-            ViewBag.Categories = new SelectList(
-                _context.Categories,
-                "CategoryId",
-                "Name");
+        //[Authorize]
+        //public IActionResult Upload()
+        //{
+        //    ViewBag.Categories = new SelectList(
+        //        _context.Categories,
+        //        "CategoryId",
+        //        "Name");
 
-            return View();
-        }
+        //    return View();
+        //}
 
         // POST: Upload
-        [HttpPost]
-        [Authorize]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Upload(PhotoUploadViewModel model)
-        {
-            var imageFile = model.ImageFile;
+        //[HttpPost]
+        //[Authorize]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> Upload(PhotoUploadViewModel model)
+        //{
+        //    var imageFile = model.ImageFile;
 
-            if (imageFile == null)
-            {
-                ModelState.AddModelError(
-                    "ImageFile",
-                    "Please select an image.");
+        //    if (imageFile == null)
+        //    {
+        //        ModelState.AddModelError(
+        //            "ImageFile",
+        //            "Please select an image.");
 
-                ViewBag.Categories = new SelectList(
-                    _context.Categories,
-                    "CategoryId",
-                    "Name");
+        //        ViewBag.Categories = new SelectList(
+        //            _context.Categories,
+        //            "CategoryId",
+        //            "Name");
 
-                return View(model);
-            }
+        //        return View(model);
+        //    }
 
-            if (!ModelState.IsValid)
-            {
-                ViewBag.Categories = new SelectList(
-                    _context.Categories,
-                    "CategoryId",
-                    "Name");
+        //    var validationError = await ImageUploadValidator.ValidateAsync(imageFile);
 
-                return View(model);
-            }
+        //    if (validationError != null)
+        //    {
+        //        ModelState.AddModelError(
+        //            "ImageFile",
+        //            validationError);
 
-            var uploadsFolder = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                "wwwroot/uploads");
+        //        ViewBag.Categories = new SelectList(
+        //            _context.Categories,
+        //            "CategoryId",
+        //            "Name");
 
-            if (!Directory.Exists(uploadsFolder))
-                Directory.CreateDirectory(uploadsFolder);
+        //        return View(model);
+        //    }
 
-            var uniqueFileName =
-                Guid.NewGuid().ToString() + "_" + imageFile.FileName;
-            var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+        //    if (!ModelState.IsValid)
+        //    {
+        //        ViewBag.Categories = new SelectList(
+        //            _context.Categories,
+        //            "CategoryId",
+        //            "Name");
 
-            using (var fileStream = new FileStream(filePath, FileMode.Create))
-            {
-                await imageFile.CopyToAsync(fileStream);
-            }
+        //        return View(model);
+        //    }
 
-            var photo = new Photo
-            {
-                Title = model.Title,
-                Description = model.Description,
-                CategoryId = model.CategoryId,
-                ImagePath = "/uploads/" + uniqueFileName
-            };
+        //    var uploadsFolder = Path.Combine(
+        //        Directory.GetCurrentDirectory(),
+        //        "wwwroot/uploads");
 
-            _context.Photos.Add(photo);
-            await _context.SaveChangesAsync();
+        //    if (!Directory.Exists(uploadsFolder))
+        //        Directory.CreateDirectory(uploadsFolder);
 
-            return RedirectToAction("Index");
-        }
+        //    var safeFileName = Path.GetFileName(imageFile.FileName);
+
+        //    var uniqueFileName =
+        //        $"{Guid.NewGuid()}_{safeFileName}";
+
+        //    var filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+        //    using (var fileStream = new FileStream(filePath, FileMode.Create))
+        //    {
+        //        await imageFile.CopyToAsync(fileStream);
+        //    }
+
+        //    var photo = new Photo
+        //    {
+        //        Title = model.Title,
+        //        Description = model.Description,
+        //        CategoryId = model.CategoryId,
+        //        ImagePath = "/uploads/" + uniqueFileName
+        //    };
+
+        //    _context.Photos.Add(photo);
+        //    await _context.SaveChangesAsync();
+
+        //    return RedirectToAction("Index");
+        //}
     }
 }

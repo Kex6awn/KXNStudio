@@ -28,7 +28,7 @@ namespace KxnPhotoStudio.Controllers
             var businessStart = new TimeSpan(9, 0, 0);
             var businessEnd = new TimeSpan(18, 0, 0);
 
-            if (durationHours < 1)
+            if (durationHours < 1 || durationHours > 12)
             {
                 return Json(new List<string>());
             }
@@ -110,7 +110,7 @@ namespace KxnPhotoStudio.Controllers
             var businessStart = new TimeSpan(9, 0, 0);
             var businessEnd = new TimeSpan(18, 0, 0);
 
-            if (durationHours < 1)
+            if (durationHours < 1 || durationHours > 12)
             {
                 return Json(new List<string>());
             }

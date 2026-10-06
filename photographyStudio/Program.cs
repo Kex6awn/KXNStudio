@@ -4,6 +4,7 @@ using KxnPhotoStudio.Data;
 using Microsoft.AspNetCore.Identity;
 using KxnPhotoStudio.Services.Implementations;
 using KxnPhotoStudio.Services.Interfaces;
+using Microsoft.AspNetCore.Http.Features;
 
 namespace KxnPhotoStudio
 {
@@ -12,6 +13,11 @@ namespace KxnPhotoStudio
         public static async Task Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.Configure<FormOptions>(options =>
+            {
+                options.MultipartBodyLengthLimit = 30 * 1024 * 1024; // 30 MB
+            });
 
             // Add services to the container.
             builder.Services.AddControllersWithViews(options =>

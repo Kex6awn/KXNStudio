@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using KxnPhotoStudio.Services;
 
 namespace KxnPhotoStudio.Areas.Admin.Controllers
 {
@@ -48,6 +49,24 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                 ModelState.AddModelError(
                     "ImageFile",
                     "Please select an image.");
+
+                ViewBag.Categories = new SelectList(
+                    _context.Categories,
+                    "CategoryId",
+                    "Name",
+                    model.CategoryId);
+
+                return View(model);
+            }
+
+            var validationError =
+                await ImageUploadValidator.ValidateAsync(imageFile);
+
+            if (validationError != null)
+            {
+                ModelState.AddModelError(
+                    "ImageFile",
+                    validationError);
 
                 ViewBag.Categories = new SelectList(
                     _context.Categories,
@@ -247,6 +266,27 @@ namespace KxnPhotoStudio.Areas.Admin.Controllers
                     model.CategoryId);
 
                 return View(model);
+            }
+
+            foreach (var imageFile in imageFiles)
+            {
+                var validationError =
+                    await ImageUploadValidator.ValidateAsync(imageFile);
+
+                if (validationError != null)
+                {
+                    ModelState.AddModelError(
+                        "ImageFiles",
+                        $"'{imageFile.FileName}': {validationError}");
+
+                    ViewBag.Categories = new SelectList(
+                        _context.Categories,
+                        "CategoryId",
+                        "Name",
+                        model.CategoryId);
+
+                    return View(model);
+                }
             }
 
             foreach (var imageFile in imageFiles)
